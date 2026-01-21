@@ -9,7 +9,16 @@
 
 #Library
 library(dplyr)
+library(readxl)
 
+#For later ill add the big 2008 to 2024 df
+X2008_2024_ÄBIN1024 <- read_excel("//storage-ume.slu.se/home$/shge0002/Desktop/ABIN files/2008-2024 ÄBIN1024.xlsx", 
+                                  sheet = "Raw")
+
+X2008_2024_ÄBIN1024 <- X2008_2024_ÄBIN1024 %>%
+  rename(
+    `Stand`= `Stand_number`
+  )        
 # Not actually changing name of the column but the values in the column
 
 
@@ -42,10 +51,37 @@ library(dplyr)
     `PCT`  = `Pre-commercially thinned?`,
     `Half Height` =`Half height (m)`,
     `North` = `x.x`,
-    `East` = `y.x`
+    `East` = `y.x`, 
+    `North` = `x.x`,
+    `East` = `y.x`,
+    `Nearest Tract` = `Closest tract`,
+    `Productivity` = `Site productivity`,
+    `Downy Height` = `Downy Birch Highest Height (m)`,
+    `Downy Total` = `Downy Birch Stems`,
+    `Downy Damage` = `Downy birch damage (whole plot)`,
+    `Silver Height` = `Silver Birch Highest Height (m)`,
+    `Silver Total` = `Silver Birch Stems`,
+    `Silver Damage` = `Silver Birch damage (whole plot)`,
+    `Rowan Height` = `Rowan Highest Height (m)`,
+    `Rowan Total` = `Rowan Stems`,
+    `Rowan Damage` = `Rowan damage (whole plot)`,
+    `Oak Height` = `Oak Highest Height (m)`,
+    `Oak Total` = `Oak Stems`,
+    `Oak Damage` = `Oak Damage (whole plot)`,
+    `Salix Height` = `Salix Highest Height (m)`,
+    `Salix Total` = `Salix Stems`,
+    `Salix Damage` = `Salix Damage (whole plot)`,
+    `Aspen Height` = `Aspen Highest Height (m)`,
+    `Aspen Total` = `Aspen Stems`,
+    `Aspen Damage` = `Aspen Damage (whole plot)`
   )
 
 
+X2008_2024_ÄBIN1024 <- X2008_2024_ÄBIN1024 %>%
+  rename(
+    `Surveyor`= `Surveyer`
+  )   
+    
 # Deleting columns not included in the 2008 to 2024 file
 ÄBIN2025col <- ÄBIN2025col %>%
   select(
@@ -60,9 +96,17 @@ library(dplyr)
     -EditDate.y,
     -Editor.x,
     -Editor.y,
-    -stand_id
+    -stand_id,
+    -`NA`,
+    -`Tallest tree 1 (m)`,
+    -`Tallest tree 2 (m)`,
+    -spruce_NA,
+    -contorta_NA
     
   )
+
+# In the damage types there are a lot of duplicates, such as fb,o and o, fb
+# same damage, so i would like to clump the duplicates
 
 sort(names(ÄBIN2025col))
 
@@ -125,6 +169,78 @@ head(combined_df)
   combined_df         # your new collapsed combination columns
 )
 
+
+########## Just to confirm uniqueness of column titles) #############
 # Optional: check new names
 names(ÄBIN2025_combined)
 
+length(unique(names(ÄBIN2025)))
+length(names(ÄBIN2025))
+
+
+######################## ######################################################
+### I would now like to re order the df to match the 2008 to 2024 df ###
+
+# First I'll look at all the column names in the two dfs
+
+x_all <- X2008_2024_ÄBIN1024
+
+x_2025 <- ÄBIN2025_combined
+
+names(x_all)
+names(x_2025)
+
+# Sometimes easier sorted:
+sort(names(x_all))
+sort(names(x_2025))
+
+#Find differences in column sets
+
+# Columns that exist in 2008–2024 but not in 2025
+setdiff(names(x_all), names(x_2025))
+
+# Columns that exist in 2025 but not in 2008–2024
+setdiff(names(x_2025), names(x_all))
+
+# Columns present in both
+intersect(names(x_all), names(x_2025))
+
+
+## I want a lis style to look at in excel
+# Get the two name vectors
+col_2008_2024 <- names(x_all)
+col_2025      <- names(x_2025)
+
+# Determine max length for equal row padding
+max_len <- max(length(col_2008_2024), length(col_2025))
+
+# Pad with "" so Excel aligns cleanly
+col_2008_2024 <- c(col_2008_2024, rep("", max_len - length(col_2008_2024)))
+col_2025      <- c(col_2025,      rep("", max_len - length(col_2025)))
+
+# Create comparison table
+compare_cols <- data.frame(
+  cols_2008_2024 = col_2008_2024,
+  cols_2025      = col_2025,
+  stringsAsFactors = FALSE
+)
+
+# View in R
+View(compare_cols)
+
+# Copy to clipboard (for Excel)
+writeClipboard(
+  paste(
+    apply(compare_cols, 1, paste, collapse = "\t"),
+    collapse = "\n"
+  )
+)
+
+               
+############# Adding columns to 2025 data ################
+              ÄBIN2025_combined <- ÄBIN2025_combined %>%
+                 mutate(Year = 2025) %>%
+                 select(Year, everything())
+               
+      
+               
