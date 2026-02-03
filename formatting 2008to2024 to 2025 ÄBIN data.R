@@ -75,3 +75,79 @@ cn[13] <- "ub"
 
 # 3. Assign the new names back
 names(X2008_2024_ÄBIN1024) <- cn
+
+####Now also with spruce and contorta"####
+
+rename_conifer_damage <- function(nm) {
+  
+  # Detect species and strip prefix
+  if (grepl("^Spruce\\b", nm)) {
+    species <- "spruce"
+    nm_clean <- sub("^Spruce\\s+", "", nm)
+  } else if (grepl("^Contorta\\b", nm)) {
+    species <- "contorta"
+    nm_clean <- sub("^Contorta\\s+", "", nm)
+  } else {
+    return(nm)  # leave other columns unchanged
+  }
+  
+  # Split on "+" (allow spaces)
+  parts <- unlist(strsplit(nm_clean, "\\s*\\+\\s*"))
+  parts <- trimws(parts)
+  parts <- parts[parts != ""]
+  
+  # Map to codes
+  codes <- vapply(parts, function(p) {
+    p_low <- tolower(p)
+    
+    # Undamaged
+    if (p_low %in% c("undamaged")) return("ub")
+    
+    # ---- Contorta terms ----
+    if (species == "contorta") {
+      if (p_low %in% c("fresh ts only", "fresh ts")) return("fts")
+      if (p_low %in% c("presummer ts")) return("ps")
+      if (p_low %in% c("fresh side shoot browsing", "side shoot browsing")) return("ss")
+      if (p_low %in% c("fresh bark damage", "bark damage")) return("fb")
+      if (p_low %in% c("fresh stem breakage", "stem breakage")) return("fs")
+      if (p_low %in% c("other fresh damage")) return("o")
+      if (p_low %in% c("old damage only", "old other damage")) return("od")  # <- corrected
+      if (p_low %in% c("old damage", "old")) return("od")
+    }
+    
+    # ---- Spruce terms ----
+    if (species == "spruce") {
+      if (p_low %in% c("winter ts", "wts")) return("fts")
+      if (p_low %in% c("winter stem", "ws")) return("fs")
+      if (p_low %in% c("winter bark", "wb")) return("fb")
+      if (p_low %in% c("old")) return("od")
+    }
+    
+    # fallback so unexpected labels stand out
+    p
+  }, FUN.VALUE = character(1))
+  
+  # Sort + deduplicate and build final name
+  codes <- sort(unique(codes))
+  paste0(species, "_", paste(codes, collapse = ","))
+}
+
+cn <- names(X2008_2024_ÄBIN1024)
+
+idx <- grep("^(Spruce|Contorta)\\b", cn)
+cn[idx] <- vapply(cn[idx], rename_conifer_damage, FUN.VALUE = character(1))
+
+names(X2008_2024_ÄBIN1024) <- cn
+
+grep("^spruce_", names(X2008_2024_ÄBIN1024), value = TRUE)
+grep("^contorta_", names(X2008_2024_ÄBIN1024), value = TRUE)
+
+###### SAVE THE FILE FOR DF "formatting to excel ÄBIN file" scrip #################
+
+library(writexl)
+
+write_xlsx(
+  X2008_2024_ÄBIN1024,
+  "X2008_2024_ÄBIN1024.xlsx"
+)
+

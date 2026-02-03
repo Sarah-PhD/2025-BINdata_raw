@@ -11,9 +11,11 @@
 library(dplyr)
 library(readxl)
 
+###LOad ÄBIN2025 from directory
+ÄBIN2025 <- read_excel("ÄBIN2025.xlsx")
+
 #For later ill add the big 2008 to 2024 df
-X2008_2024_ÄBIN1024 <- read_excel("//storage-ume.slu.se/home$/shge0002/Desktop/ABIN files/2008-2024 ÄBIN1024.xlsx", 
-                                  sheet = "Raw")
+X2008_2024_ÄBIN1024 <- read_excel("X2008_2024_ÄBIN1024.xlsx")
 
 X2008_2024_ÄBIN1024 <- X2008_2024_ÄBIN1024 %>%
   rename(
@@ -101,12 +103,20 @@ X2008_2024_ÄBIN1024 <- X2008_2024_ÄBIN1024 %>%
     -`Tallest tree 1 (m)`,
     -`Tallest tree 2 (m)`,
     -spruce_NA,
-    -contorta_NA
+    -contorta_NA,
+    -`spruce_o,ub`,
+    -`spruce_ub,o`
+    
+    
     
   )
 
+
+
 # In the damage types there are a lot of duplicates, such as fb,o and o, fb
 # same damage, so i would like to clump the duplicates
+
+
 
 sort(names(ÄBIN2025col))
 
@@ -168,6 +178,37 @@ head(combined_df)
   df[, -code_cols],   # all the other columns unchanged
   combined_df         # your new collapsed combination columns
 )
+
+###################### Spruce and contorta duplicates##########################
+# Spruce
+ÄBIN2025_combined$`spruce_o,od` <- rowSums(
+  ÄBIN2025_combined[, c("spruce_o,od", "spruce_od,o")],
+  na.rm = TRUE
+)
+
+
+# Contorta 
+df <- ÄBIN2025_combined
+
+cont_cols <- grep("^contorta_", names(df), value = TRUE)
+
+canon_names <- vapply(cont_cols, function(nm) {
+  codes <- sub("^contorta_", "", nm)
+  parts <- sort(trimws(strsplit(codes, ",")[[1]]))
+  paste0("contorta_", paste(parts, collapse = ","))
+}, FUN.VALUE = character(1))
+
+groups <- split(cont_cols, canon_names)
+
+combined_df <- as.data.frame(lapply(groups, function(cols) {
+  m <- df[, cols, drop = FALSE]
+  m_num <- as.data.frame(lapply(m, function(x) as.numeric(as.character(x))))
+  rowSums(m_num, na.rm = TRUE)
+}))
+names(combined_df) <- names(groups)
+
+df <- cbind(df[, setdiff(names(df), cont_cols), drop = FALSE], combined_df)
+ÄBIN2025_combined <- df
 
 
 ########## Just to confirm uniqueness of column titles) #############
@@ -236,11 +277,33 @@ writeClipboard(
   )
 )
 
-               
-############# Adding columns to 2025 data ################
-              ÄBIN2025_combined <- ÄBIN2025_combined %>%
-                 mutate(Year = 2025) %>%
-                 select(Year, everything())
-               
+
+###### MERGE X2008_2025_ÄBIN1024 with ÄBIN2025_combined ##########
+############# First Adding Year to 2025 data ################
+ÄBIN2025_combined <- ÄBIN2025_combined %>%
+  mutate(Year = 2025) %>%
+  select(Year, everything())
+
+X2008_2025_ÄBIN1024 <- bind_rows(
+  X2008_2024_ÄBIN1024,
+  ÄBIN2025_combined
+)
+
+# Confirm 2025 was added
+table(X2008_2025_ÄBIN1024$Year)
+
+# See which columns were unique to each df (optional)
+setdiff(names(X2008_2024_ÄBIN1024), names(ÄBIN2025_combined))
+
+setdiff(names(ÄBIN2025_combined), names(X2008_2024_ÄBIN1024))
+
+
+
+####### REname ######
+
+ÄBIN2008_2025 <- X2008_2025_ÄBIN1024
+
+####### Save on directory ####
+
       
-               
+write_xlsx(ÄBIN2008_2025, "ÄBIN2008_2025.xlsx")
