@@ -247,3 +247,4 @@ write_xlsx(
   ÄBIN2025,
   "ÄBIN2025.xlsx"
 )
+

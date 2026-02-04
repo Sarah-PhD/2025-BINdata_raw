@@ -12,7 +12,7 @@
 library(readxl)
 library(dplyr)
 library(tidyr)
-
+library(writexl)
 ####VÄXJÖ#####
 
 #Import an rename each sheet 
@@ -68,6 +68,8 @@ pine_damage_wide <- pine_damage_events %>%
     values_from = damage_events,
     values_fill = 0
   )
+
+############# I double checked the damages with raw data and it is correct
 
 
 #The servity is in a text state atm, so the severity runs from ≤10, 11_25, 26_50
@@ -258,3 +260,4 @@ write_xlsx(
   ÄBIN2025,
   "ÄBIN2025.xlsx"
 )
+
