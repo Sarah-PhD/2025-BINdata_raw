@@ -307,3 +307,16 @@ setdiff(names(ÄBIN2025_combined), names(X2008_2024_ÄBIN1024))
 
       
 write_xlsx(ÄBIN2008_2025, "ÄBIN2008_2025.xlsx")
+
+ÄBIN2008_2025 %>%
+  group_by(Year) %>%
+  summarise(
+    min = min(`Moose Piles`, na.rm = TRUE),
+    max = max(`Moose Piles`, na.rm = TRUE),
+    n = n(),
+    .groups = "drop"
+  ) %>%
+  arrange(Year)
+
+grep("moose", names(X2008_2024_ÄBIN1024), ignore.case = TRUE, value = TRUE)
+grep("Moose", names(ÄBIN2008_2025), value = TRUE)

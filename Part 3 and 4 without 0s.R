@@ -298,6 +298,69 @@ X2008_2025_ÄBIN1024 <- bind_rows(
   if (is.logical(x)) as.numeric(x) else x
 })
 
+############ Moose piles and Moose pellets are in different rows ########
+pellet_cols <- grep(
+  "pellet|pile|piles|moose|reindeer|deer|boar",
+  names(ÄBIN2008_2025),
+  ignore.case = TRUE,
+  value = TRUE
+)
+
+pellet_cols
+
+library(dplyr)
+library(rlang)
+
+# Explicit column groups to unify
+moose_cols     <- c("Moose Pellets", "Moose Piles")
+reddeer_cols   <- c("Red Deer Pellets", "Red Deer Piles")
+smalldeer_cols <- c("Small Deer Pellets", "Small Deer Piles")
+reindeer_cols  <- c("Reindeer", "Reindeer Piles")   # treat as same unit (per your request)
+wildboar_cols  <- c("Wild Boar")                    # no duplicates listed, but keep as unified
+
+# Keep only columns that actually exist
+moose_cols     <- intersect(moose_cols, names(ÄBIN2008_2025))
+reddeer_cols   <- intersect(reddeer_cols, names(ÄBIN2008_2025))
+smalldeer_cols <- intersect(smalldeer_cols, names(ÄBIN2008_2025))
+reindeer_cols  <- intersect(reindeer_cols, names(ÄBIN2008_2025))
+wildboar_cols  <- intersect(wildboar_cols, names(ÄBIN2008_2025))
+
+# Coalesce into unified columns
+ÄBIN2008_2025 <- ÄBIN2008_2025 %>%
+  mutate(
+    Moose_Pellets_unified      = if (length(moose_cols) > 0)     coalesce(!!!syms(moose_cols))     else NA_real_,
+    RedDeer_Pellets_unified    = if (length(reddeer_cols) > 0)   coalesce(!!!syms(reddeer_cols))   else NA_real_,
+    SmallDeer_Pellets_unified  = if (length(smalldeer_cols) > 0) coalesce(!!!syms(smalldeer_cols)) else NA_real_,
+    Reindeer_Pellets_unified   = if (length(reindeer_cols) > 0)  coalesce(!!!syms(reindeer_cols))  else NA_real_,
+    WildBoar_unified           = if (length(wildboar_cols) > 0)  coalesce(!!!syms(wildboar_cols))  else NA_real_
+  ) %>%
+  mutate(across(ends_with("_unified"), ~ suppressWarnings(as.numeric(.x))))
+
+
+
+### Replace old columns ###
+
+
+ÄBIN2008_2025 <- ÄBIN2008_2025 %>%
+  select(-all_of(c("Moose Pellets","Moose Piles",
+                   "Red Deer Pellets","Red Deer Piles",
+                   "Small Deer Pellets","Small Deer Piles",
+                   "Reindeer","Reindeer Piles",
+                   "Wild Boar"))) %>%
+  rename(
+    `Moose Pellets`      = Moose_Pellets_unified,
+    `Red Deer Pellets`   = RedDeer_Pellets_unified,
+    `Small Deer Pellets` = SmallDeer_Pellets_unified,
+    `Reindeer Pellets`   = Reindeer_Pellets_unified,
+    `Wild Boar`          = WildBoar_unified
+  )
+
+### quick na check
+grep("Moose|Deer|Reindeer|Boar", names(ÄBIN2008_2025), value = TRUE)
+summary(ÄBIN2008_2025$`Moose Pellets`)
+summary(ÄBIN2008_2025$`Wild Boar`)
+
+
 write_xlsx(ÄBIN2008_2025, "ÄBIN2008_2025.xlsx")
 
 # Check MA20 (your check)

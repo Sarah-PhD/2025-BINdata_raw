@@ -264,3 +264,6 @@ df_MA20 <- ÄBIN2008_2025 %>%
 nrow(df_MA20)
 unique(df_MA20$Year)
 View(df_MA20)
+
+
+write_xlsx(ÄBIN2008_2025, "ÄBIN2008_2025a.xlsx")
