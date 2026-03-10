@@ -6,14 +6,13 @@
 
 ##### IMPORT data from directory ####
 
-ÄBIN2008_2025 <- read_excel("ÄBIN2008_2025.xlsx")
+ÄBIN2008_2025 <- read.csv("ÄBIN2008_2025.csv")
+names(ÄBIN2008_2025) <- gsub("\\.", "_", names(ÄBIN2008_2025))
 
 library(dplyr)
 library(stringr)
 library(readxl)
 
-# ---- Load ----
-ÄBIN2008_2025 <- read_excel("ÄBIN2008_2025.xlsx")
 
 # ============================================================
 # 1) Half Height: standardise to cm
@@ -21,7 +20,7 @@ library(readxl)
 
 ÄBIN2008_2025 <- ÄBIN2008_2025 %>%
   mutate(
-    Half_Height_raw = suppressWarnings(as.numeric(`Half Height`)),
+    Half_Height_raw = suppressWarnings(as.numeric(`Half_Height`)),
     Half_Height_cm = case_when(
       is.na(Half_Height_raw) ~ NA_real_,
       Half_Height_raw < 7   ~ Half_Height_raw * 100,  # metres -> cm
@@ -256,7 +255,7 @@ cat("First pine_ columns after pine_unbrowsed:\n")
 pu_pos <- which(names(ÄBIN2008_2025) == "pine_unbrowsed")
 print(names(ÄBIN2008_2025)[(pu_pos+1):(pu_pos+20)])
 
-
+names(ÄBIN2008_2025) <- gsub("\\.", "_", names(ÄBIN2008_2025))
 
 # Check MA20 (your check)
 df_MA20 <- ÄBIN2008_2025 %>%
@@ -266,4 +265,11 @@ unique(df_MA20$Year)
 View(df_MA20)
 
 
-write_xlsx(ÄBIN2008_2025, "ÄBIN2008_2025a.xlsx")
+write_csv(ÄBIN2008_2025, "ÄBIN2008_2025.csv")
+
+
+write_csv(
+  ÄBIN2008_2025,
+  "ÄBIN2008_2025.csv"
+)
+

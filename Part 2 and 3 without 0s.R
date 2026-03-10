@@ -294,9 +294,17 @@ X2008_2025_ÄBIN1024 <- bind_rows(
 
 # Logical -> numeric (your step)
 ÄBIN2008_2025 <- X2008_2025_ÄBIN1024
+
+###############################################################################
+################ CAUTION!!!!! MAY NOT WORK ####################################
+###############################################################################
+
 ÄBIN2008_2025[] <- lapply(ÄBIN2008_2025, function(x) {
   if (is.logical(x)) as.numeric(x) else x
 })
+###############################################################################
+###############################################################################
+
 
 ############ Moose piles and Moose pellets are in different rows ########
 pellet_cols <- grep(
@@ -360,8 +368,14 @@ grep("Moose|Deer|Reindeer|Boar", names(ÄBIN2008_2025), value = TRUE)
 summary(ÄBIN2008_2025$`Moose Pellets`)
 summary(ÄBIN2008_2025$`Wild Boar`)
 
+library(readr)
 
-write_xlsx(ÄBIN2008_2025, "ÄBIN2008_2025.xlsx")
+write_csv(
+  ÄBIN2008_2025,
+  "ÄBIN2008_2025.csv"
+)
+
+names(ÄBIN2008_2025) <- gsub("\\.", "_", names(ÄBIN2008_2025))
 
 # Check MA20 (your check)
 df_MA20 <- ÄBIN2008_2025 %>%
@@ -369,3 +383,4 @@ df_MA20 <- ÄBIN2008_2025 %>%
 nrow(df_MA20)
 unique(df_MA20$Year)
 View(df_MA20)
+
