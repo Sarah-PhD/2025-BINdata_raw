@@ -611,7 +611,10 @@ abin_all <- add_damage_props(
   abin_all,
   prefix = "pine",
   codes = c("fts", "o", "od", "fb", "fs", "ps", "ss"),
-  ub_col = "pine_unbrowsed"
+  ub_col = "pine_unbrowsed",
+  winter_tokens = c("fts", "fb", "fs"),
+  summer_tokens = c("ps"),
+  rebrows_tokens = c("fts", "fb", "fs", "ps")
 )
 
 abin_all <- add_damage_props(
@@ -630,8 +633,9 @@ abin_all <- add_damage_props(
 
 #=============================================================================
 # 11) YEAR-AWARE HARMONISE FINAL PINE COLUMNS
-# Recompute 2025 pine values directly from pine combo columns
-# older years keep historical values
+# Rebuild winter, summer, and yearly pine variables directly from pine combo cols
+# 2025 and other detailed years use recomputed values
+# older years fall back to historical columns
 #=============================================================================
 
 # Which year column exists?
@@ -650,11 +654,22 @@ hist_pine_stems_col <- if ("Pine_stems" %in% names(abin_all)) "Pine_stems" else 
 hist_pine_winter_n_col <- if ("Pine_Winter_Damage_Stems" %in% names(abin_all)) "Pine_Winter_Damage_Stems" else NULL
 hist_pine_winter_p_col <- if ("Proportion_Pine_Damage_Winter" %in% names(abin_all)) "Proportion_Pine_Damage_Winter" else NULL
 
-for (nm in c(hist_pine_stems_col, hist_pine_winter_n_col, hist_pine_winter_p_col)) {
+hist_pine_summer_n_col <- if ("Pine_Summer_Damage_Stems" %in% names(abin_all)) "Pine_Summer_Damage_Stems" else NULL
+hist_pine_summer_p_col <- if ("Proportion_Pine_Damage_Summer" %in% names(abin_all)) "Proportion_Pine_Damage_Summer" else NULL
+
+hist_pine_yearly_n_col <- if ("Pine_Yearly_Damage_Stems" %in% names(abin_all)) "Pine_Yearly_Damage_Stems" else NULL
+hist_pine_yearly_p_col <- if ("Proportion_Pine_Damage_Yearly" %in% names(abin_all)) "Proportion_Pine_Damage_Yearly" else NULL
+
+for (nm in c(
+  hist_pine_stems_col,
+  hist_pine_winter_n_col, hist_pine_winter_p_col,
+  hist_pine_summer_n_col, hist_pine_summer_p_col,
+  hist_pine_yearly_n_col, hist_pine_yearly_p_col
+)) {
   if (!is.null(nm)) abin_all[[nm]] <- to_num(abin_all[[nm]])
 }
 
-# Identify pine combo columns again
+# Identify pine combo columns
 pine_codes <- c("fts", "o", "od", "fb", "fs", "ps", "ss")
 
 pine_combo_regex <- paste0(
@@ -668,58 +683,135 @@ pine_combo_regex <- paste0(
 pine_combo_cols <- names(abin_all)[str_detect(names(abin_all), pine_combo_regex)]
 
 if (length(pine_combo_cols) == 0) {
-  stop("No pine combo columns found for recomputing 2025 pine values.")
+  stop("No pine combo columns found for recomputing pine values.")
 }
 
 # Total pine stems = all pine combo columns + pine_unbrowsed
 pine_sum_cols <- intersect(c(pine_combo_cols, "pine_unbrowsed"), names(abin_all))
 if (length(pine_sum_cols) == 0) {
-  stop("No pine stem columns found for recomputing 2025 pine values.")
+  stop("No pine stem columns found for recomputing pine values.")
 }
 
-# Winter browsing = any combo containing fts OR fb OR fs
+# Winter = any combo containing fts OR fb OR fs
 winter_tokens <- c("fts", "fb", "fs")
-winter_regex  <- paste0("(^pine_|,)(?:", paste(winter_tokens, collapse = "|"), ")(,|$)")
-winter_cols   <- pine_combo_cols[str_detect(pine_combo_cols, winter_regex)]
+winter_regex <- paste0("(^pine_|,)(?:", paste(winter_tokens, collapse = "|"), ")(,|$)")
+winter_cols <- pine_combo_cols[str_detect(pine_combo_cols, winter_regex)]
+
+# Summer = any combo containing ps
+summer_tokens <- c("ps")
+summer_regex <- paste0("(^pine_|,)(?:", paste(summer_tokens, collapse = "|"), ")(,|$)")
+summer_cols <- pine_combo_cols[str_detect(pine_combo_cols, summer_regex)]
+
+# Yearly fresh = any combo containing fts OR fb OR fs OR ps
+yearly_tokens <- c("fts", "fb", "fs", "ps")
+yearly_regex <- paste0("(^pine_|,)(?:", paste(yearly_tokens, collapse = "|"), ")(,|$)")
+yearly_cols <- pine_combo_cols[str_detect(pine_combo_cols, yearly_regex)]
 
 if (length(winter_cols) == 0) {
-  stop("No winter browsing pine columns found for recomputing 2025 pine values.")
+  stop("No winter browsing pine columns found.")
 }
+if (length(summer_cols) == 0) {
+  warning("No summer browsing pine columns found.")
+}
+if (length(yearly_cols) == 0) {
+  stop("No yearly fresh-damage pine columns found.")
+}
+
+cat("\nWinter cols used:\n")
+print(winter_cols)
+
+cat("\nSummer cols used:\n")
+print(summer_cols)
+
+cat("\nYearly cols used:\n")
+print(yearly_cols)
 
 # Recompute directly from source columns
 abin_all <- abin_all %>%
-  mutate(across(all_of(unique(c(pine_sum_cols, winter_cols))), to_num)) %>%
+  mutate(across(all_of(unique(c(pine_sum_cols, winter_cols, summer_cols, yearly_cols))), to_num)) %>%
   mutate(
-    pine_stems_2025calc = rowSums_keepNA_df(select(., all_of(pine_sum_cols))),
-    pine_winter_damage_stems_2025calc = rowSums_keepNA_df(select(., all_of(winter_cols))),
-    proportion_pine_damage_winter_2025calc = if_else(
-      is.na(pine_stems_2025calc) | pine_stems_2025calc == 0,
+    pine_stems_calc = rowSums_keepNA_df(select(., all_of(pine_sum_cols))),
+    pine_winter_damage_stems_calc = rowSums_keepNA_df(select(., all_of(winter_cols))),
+    pine_summer_damage_stems_calc = if (length(summer_cols) > 0) {
+      rowSums_keepNA_df(select(., all_of(summer_cols)))
+    } else {
+      NA_real_
+    },
+    pine_yearly_damage_stems_calc = pmax(
+      rowSums_keepNA_df(select(., all_of(yearly_cols))),
+      pine_winter_damage_stems_calc,
+      na.rm = TRUE
+    ),
+    
+    proportion_pine_damage_winter_calc = if_else(
+      is.na(pine_stems_calc) | pine_stems_calc == 0,
       NA_real_,
-      pine_winter_damage_stems_2025calc / pine_stems_2025calc
+      pine_winter_damage_stems_calc / pine_stems_calc
+    ),
+    proportion_pine_damage_summer_calc = if_else(
+      is.na(pine_stems_calc) | pine_stems_calc == 0,
+      NA_real_,
+      pine_summer_damage_stems_calc / pine_stems_calc
+    ),
+    proportion_pine_damage_yearly_calc = if_else(
+      is.na(pine_stems_calc) | pine_stems_calc == 0,
+      NA_real_,
+      pine_yearly_damage_stems_calc / pine_stems_calc
     )
   )
 
-# Final year-aware columns
+# Use calculated values when detailed pine coding exists;
+# otherwise fall back to historical columns
 abin_all <- abin_all %>%
   mutate(
-    pine_stems = if_else(
-      .data[[year_col]] == 2025,
-      pine_stems_2025calc,
-      if (!is.null(hist_pine_stems_col)) to_num(.data[[hist_pine_stems_col]]) else pine_stems_2025calc
+    has_detailed_pine = rowSums(!is.na(select(., any_of(pine_combo_cols)))) > 0
+  ) %>%
+  mutate(
+    pine_stems = case_when(
+      has_detailed_pine ~ pine_stems_calc,
+      !is.null(hist_pine_stems_col) ~ to_num(.data[[hist_pine_stems_col]]),
+      TRUE ~ pine_stems_calc
     ),
-    pine_winter_damage_stems = if_else(
-      .data[[year_col]] == 2025,
-      pine_winter_damage_stems_2025calc,
-      if (!is.null(hist_pine_winter_n_col)) to_num(.data[[hist_pine_winter_n_col]]) else pine_winter_damage_stems_2025calc
+    
+    pine_winter_damage_stems = case_when(
+      has_detailed_pine ~ pine_winter_damage_stems_calc,
+      !is.null(hist_pine_winter_n_col) ~ to_num(.data[[hist_pine_winter_n_col]]),
+      TRUE ~ pine_winter_damage_stems_calc
     ),
-    proportion_pine_damage_winter = if_else(
-      .data[[year_col]] == 2025,
-      proportion_pine_damage_winter_2025calc,
-      if (!is.null(hist_pine_winter_p_col)) to_num(.data[[hist_pine_winter_p_col]]) else proportion_pine_damage_winter_2025calc
+    
+    pine_summer_damage_stems = case_when(
+      has_detailed_pine ~ pine_summer_damage_stems_calc,
+      !is.null(hist_pine_summer_n_col) ~ to_num(.data[[hist_pine_summer_n_col]]),
+      TRUE ~ NA_real_
+    ),
+    
+    pine_yearly_damage_stems = case_when(
+      has_detailed_pine ~ pmax(pine_yearly_damage_stems_calc, pine_winter_damage_stems, na.rm = TRUE),
+      !is.na(pine_winter_damage_stems) ~ pine_winter_damage_stems,
+      TRUE ~ NA_real_
+    ),
+    
+    proportion_pine_damage_winter = case_when(
+      has_detailed_pine ~ proportion_pine_damage_winter_calc,
+      !is.null(hist_pine_winter_p_col) ~ to_num(.data[[hist_pine_winter_p_col]]),
+      TRUE ~ proportion_pine_damage_winter_calc
+    ),
+    
+    proportion_pine_damage_summer = case_when(
+      has_detailed_pine ~ proportion_pine_damage_summer_calc,
+      !is.null(hist_pine_summer_p_col) ~ to_num(.data[[hist_pine_summer_p_col]]),
+      TRUE ~ NA_real_
+    ),
+    
+    proportion_pine_damage_yearly = if_else(
+      !is.na(pine_stems) & pine_stems > 0,
+      pine_yearly_damage_stems / pine_stems,
+      NA_real_
     )
   )
+
 #=============================================================================
-# 11B) STANDARDISE PINE WINTER PROPORTION TO 0-1 SCALE
+# 11B) STANDARDISE FINAL PINE PROPORTIONS TO 0-1 SCALE
 #=============================================================================
 
 abin_all <- abin_all %>%
@@ -729,7 +821,6 @@ abin_all <- abin_all %>%
       proportion_pine_damage_winter / 100,
       proportion_pine_damage_winter
     ),
-
     proportion_pine_damage_summer = if_else(
       !is.na(proportion_pine_damage_summer) & proportion_pine_damage_summer > 1,
       proportion_pine_damage_summer / 100,
@@ -740,8 +831,22 @@ abin_all <- abin_all %>%
       proportion_pine_damage_yearly / 100,
       proportion_pine_damage_yearly
     )
+  ) %>%
+  mutate(
+    proportion_pine_damage_winter = if_else(
+      proportion_pine_damage_winter > 1, NA_real_, proportion_pine_damage_winter
+    ),
+    proportion_pine_damage_summer = if_else(
+      proportion_pine_damage_summer > 1, NA_real_, proportion_pine_damage_summer
+    ),
+    proportion_pine_damage_yearly = if_else(
+      proportion_pine_damage_yearly > 1, NA_real_, proportion_pine_damage_yearly
+    )
   )
+
 summary(abin_all$proportion_pine_damage_winter)
+summary(abin_all$proportion_pine_damage_summer)
+summary(abin_all$proportion_pine_damage_yearly)
 
 summary(abin_all$proportion_pine_damage_winter[abin_all[[year_col]] == 2025])
 summary(abin_all$proportion_pine_damage_winter[abin_all[[year_col]] < 2025])
@@ -785,6 +890,63 @@ abin_all <- rename_if_present(abin_all, "contorta_winter_damage_prop", "contorta
 abin_all <- rename_if_present(abin_all, "contorta_summer_damage_prop", "contorta_summer_damage_prop")
 abin_all <- rename_if_present(abin_all, "contorta_rebrowsing_prop", "contorta_rebrowsing_prop")
 
+
+#=============================================================================
+# 14B) FINAL POST-MERGE PINE HARMONISATION
+#=============================================================================
+
+abin_all <- abin_all %>%
+  mutate(
+    pine_stems = to_num(pine_stems),
+    pine_winter_damage_stems = to_num(pine_winter_damage_stems),
+    pine_summer_damage_stems = to_num(pine_summer_damage_stems),
+    pine_yearly_damage_stems = to_num(pine_yearly_damage_stems)
+  ) %>%
+  mutate(
+    # enforce logical consistency:
+    # yearly must be at least winter
+    pine_yearly_damage_stems = case_when(
+      !is.na(pine_yearly_damage_stems) & !is.na(pine_winter_damage_stems) ~
+        pmax(pine_yearly_damage_stems, pine_winter_damage_stems),
+      is.na(pine_yearly_damage_stems) & !is.na(pine_winter_damage_stems) ~
+        pine_winter_damage_stems,
+      TRUE ~ pine_yearly_damage_stems
+    )
+  ) %>%
+  mutate(
+    proportion_pine_damage_winter = if_else(
+      !is.na(pine_stems) & pine_stems > 0 & !is.na(pine_winter_damage_stems),
+      pine_winter_damage_stems / pine_stems,
+      NA_real_
+    ),
+    proportion_pine_damage_summer = if_else(
+      !is.na(pine_stems) & pine_stems > 0 & !is.na(pine_summer_damage_stems),
+      pine_summer_damage_stems / pine_stems,
+      NA_real_
+    ),
+    proportion_pine_damage_yearly = if_else(
+      !is.na(pine_stems) & pine_stems > 0 & !is.na(pine_yearly_damage_stems),
+      pine_yearly_damage_stems / pine_stems,
+      NA_real_
+    )
+  ) %>%
+  mutate(
+    proportion_pine_damage_winter = if_else(
+      !is.na(proportion_pine_damage_winter) & proportion_pine_damage_winter > 1,
+      NA_real_,
+      proportion_pine_damage_winter
+    ),
+    proportion_pine_damage_summer = if_else(
+      !is.na(proportion_pine_damage_summer) & proportion_pine_damage_summer > 1,
+      NA_real_,
+      proportion_pine_damage_summer
+    ),
+    proportion_pine_damage_yearly = if_else(
+      !is.na(proportion_pine_damage_yearly) & proportion_pine_damage_yearly > 1,
+      NA_real_,
+      proportion_pine_damage_yearly
+    )
+  )
 #=============================================================================
 # 15) OPTIONAL CLEANUP OF TEMPORARY COLUMNS
 #=============================================================================
@@ -792,8 +954,13 @@ abin_all <- rename_if_present(abin_all, "contorta_rebrowsing_prop", "contorta_re
 drop_temp <- intersect(
   c(
     "pine_stems_calc",
-    "pine_winter_browsed_stems_calc",
-    "winter_browsing_calc",
+    "pine_winter_damage_stems_calc",
+    "pine_summer_damage_stems_calc",
+    "pine_yearly_damage_stems_calc",
+    "proportion_pine_damage_winter_calc",
+    "proportion_pine_damage_summer_calc",
+    "proportion_pine_damage_yearly_calc",
+    "has_detailed_pine",
     "half_height_raw"
   ),
   names(abin_all)
@@ -802,7 +969,6 @@ drop_temp <- intersect(
 if (length(drop_temp) > 0) {
   abin_all <- abin_all %>% select(-all_of(drop_temp))
 }
-
 #=============================================================================
 # 16) OPTIONAL CHECKS
 #=============================================================================
@@ -836,6 +1002,8 @@ compact_keep <- intersect(
     "proportion_pine_damage_summer",
     "pine_rebrowsed_stems",
     "pine_rebrowsing_prop",
+    "pine_yearly_damage_stems",
+    "proportion_pine_damage_yearly",
     
     "spruce_ub",
     "spruce_stems",
@@ -900,4 +1068,30 @@ summary(abin_all$proportion_pine_damage_winter)
 sum(!is.na(abin_all$pine_stems[abin_all[[year_col]] == 2025]))
 sum(!is.na(abin_all$pine_winter_damage_stems[abin_all[[year_col]] == 2025]))
 sum(!is.na(abin_all$proportion_pine_damage_winter[abin_all[[year_col]] == 2025]))
+
+#=============================================================================
+# 19) FINAL PINE DATA QUALITY CHECKS
+#=============================================================================
+
+cat("\n--- FINAL PINE QC ---\n")
+
+print(summary(abin_all$pine_stems))
+print(summary(abin_all$pine_winter_damage_stems))
+print(summary(abin_all$pine_summer_damage_stems))
+print(summary(abin_all$pine_yearly_damage_stems))
+
+print(summary(abin_all$proportion_pine_damage_winter))
+print(summary(abin_all$proportion_pine_damage_summer))
+print(summary(abin_all$proportion_pine_damage_yearly))
+
+cat("\nCounts of impossible values:\n")
+cat("winter > stems: ",
+    sum(abin_all$pine_winter_damage_stems > abin_all$pine_stems, na.rm = TRUE), "\n")
+cat("summer > stems: ",
+    sum(abin_all$pine_summer_damage_stems > abin_all$pine_stems, na.rm = TRUE), "\n")
+cat("yearly > stems: ",
+    sum(abin_all$pine_yearly_damage_stems > abin_all$pine_stems, na.rm = TRUE), "\n")
+
+cat("yearly < winter: ",
+    sum(abin_all$pine_yearly_damage_stems < abin_all$pine_winter_damage_stems, na.rm = TRUE), "\n")
 
