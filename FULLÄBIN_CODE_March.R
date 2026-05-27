@@ -21,7 +21,7 @@ library(tidyr)
 library(stringr)
 library(writexl)
 library(purrr)
-
+library(lubridate)
 #=============================================================================
 # 1) HELPERS
 #=============================================================================
@@ -34,6 +34,78 @@ to_num <- function(x) {
   x <- gsub(",", ".", x)
   suppressWarnings(as.numeric(x))
 }
+# Robust date parser for mixed ÄBIN formats
+# Handles Excel dates, normal dates, and 2025 strings like "4/5/2025 2:25:00 PM"
+parse_abin_date <- function(x) {
+  if (inherits(x, "Date")) return(x)
+  
+  x_chr <- trimws(as.character(x))
+  x_chr[x_chr == ""] <- NA_character_
+  
+  x_num <- suppressWarnings(as.numeric(x_chr))
+  
+  # Excel-style numeric dates
+  date_excel <- suppressWarnings(
+    ifelse(
+      !is.na(x_num) & x_num > 30000,
+      as.character(as.Date(x_num, origin = "1899-12-30")),
+      NA_character_
+    )
+  )
+  
+  # Text/date-time formats
+  date_text <- suppressWarnings(
+    as.character(as.Date(lubridate::parse_date_time(
+      x_chr,
+      orders = c(
+        "ymd HMS", "ymd HM", "ymd",
+        "dmy HMS", "dmy HM", "dmy",
+        "mdy HMS", "mdy HM", "mdy",
+        "Ymd HMS", "Ymd HM", "Ymd",
+        "dmY HMS", "dmY HM", "dmY",
+        "mdY HMS", "mdY HM", "mdY",
+        "mdy IMS p", "mdy IM p",
+        "dmy IMS p", "dmy IM p"
+      ),
+      tz = "UTC"
+    )))
+  )
+  
+  out <- dplyr::coalesce(
+    as.Date(date_excel),
+    as.Date(date_text)
+  )
+  
+  # Remove nonsense early dates
+  out[lubridate::year(out) < 2000] <- NA
+  
+  out
+}
+
+# Safely coalesce across possible column names
+coalesce_existing <- function(df, candidates) {
+  nms_low <- tolower(names(df))
+  idx <- match(tolower(candidates), nms_low)
+  idx <- idx[!is.na(idx)]
+  
+  if (length(idx) == 0) {
+    return(rep(NA_real_, nrow(df)))
+  }
+  
+  Reduce(dplyr::coalesce, lapply(df[idx], to_num))
+}
+
+# Find the first column name that exists in the dataframe
+first_existing <- function(candidates, df) {
+  hit <- candidates[candidates %in% names(df)]
+  
+  if (length(hit) == 0) {
+    return(NA_character_)
+  }
+  
+  hit[1]
+}
+
 
 rowSums_keepNA_df <- function(df_subset) {
   m <- as.data.frame(lapply(df_subset, to_num))
@@ -512,7 +584,7 @@ if (length(code_cols) > 0) {
 abin2025 <- abin2025 %>%
   mutate(
     Year = 2025,
-    Date = as.Date(Date)
+    Date = parse_abin_date(Date)
   ) %>%
   rename(
     stand = Stand,
@@ -528,26 +600,28 @@ names(abin2025)  <- clean_names_basic(names(abin2025))
 
 abin_all <- bind_rows(abin_hist, abin2025)
 
-#=============================================================================
-# 7) STANDARDISE KEY VARIABLES
+##=============================================================================
+# 7) STANDARDISE HEIGHT VARIABLES TO METERS
 #=============================================================================
 
-if ("half_height" %in% names(abin_all)) {
-  abin_all <- abin_all %>%
-    mutate(
-      half_height_raw = to_num(half_height),
-      half_height_cm = case_when(
-        is.na(half_height_raw) ~ NA_real_,
-        half_height_raw < 7 ~ half_height_raw * 100,
-        TRUE ~ half_height_raw
+height_cols <- c("half_height", "downy_height", "silver_height")
+
+abin_all <- abin_all %>%
+  mutate(
+    across(any_of(height_cols), to_num),
+    across(
+      any_of(height_cols),
+      ~ case_when(
+        is.na(.) ~ NA_real_,
+        . > 8 ~ . / 100,   # cm → m
+        TRUE ~ .
       )
     )
-}
+  )
 
 abin_all[] <- lapply(abin_all, function(x) {
   if (is.logical(x)) as.numeric(x) else x
 })
-
 #=============================================================================
 # 8) PREFIX PINE DAMAGE COMBO COLUMNS
 #=============================================================================
@@ -579,30 +653,55 @@ if (length(cols_to_prefix) > 0) {
 }
 
 #=============================================================================
-# 9) UNIFY PELLET COLUMNS
+# 9) PRESERVE RAW PELLET COUNTS EARLY
+# Handles both older *_pellets and 2025 *_piles before final name cleaning
 #=============================================================================
-
-moose_cols     <- intersect(c("moose_pellets", "moose_piles"), names(abin_all))
-reddeer_cols   <- intersect(c("red_deer_pellets", "red_deer_piles"), names(abin_all))
-smalldeer_cols <- intersect(c("small_deer_pellets", "small_deer_piles"), names(abin_all))
-reindeer_cols  <- intersect(c("reindeer", "reindeer_piles", "reindeer_pellets"), names(abin_all))
-wildboar_cols  <- intersect(c("wild_boar"), names(abin_all))
 
 abin_all <- abin_all %>%
   mutate(
-    moose_pellets = if (length(moose_cols) > 0) coalesce(!!!syms(moose_cols)) else NA_real_,
-    red_deer_pellets = if (length(reddeer_cols) > 0) coalesce(!!!syms(reddeer_cols)) else NA_real_,
-    small_deer_pellets = if (length(smalldeer_cols) > 0) coalesce(!!!syms(smalldeer_cols)) else NA_real_,
-    reindeer_pellets = if (length(reindeer_cols) > 0) coalesce(!!!syms(reindeer_cols)) else NA_real_,
-    wild_boar = if (length(wildboar_cols) > 0) coalesce(!!!syms(wildboar_cols)) else NA_real_
-  ) %>%
-  mutate(
-    across(
-      c(moose_pellets, red_deer_pellets, small_deer_pellets, reindeer_pellets, wild_boar),
-      to_num
+    moose_pellets_original = coalesce_existing(
+      .,
+      c("moose_pellets", "Moose_pellets", "moose_piles", "Moose_piles")
+    ),
+    
+    red_deer_pellets_original = coalesce_existing(
+      .,
+      c("red_deer_pellets", "Red_deer_pellets", "red_deer_piles", "Red_deer_piles")
+    ),
+    
+    small_deer_pellets_original = coalesce_existing(
+      .,
+      c("small_deer_pellets", "Small_deer_pellets", "small_deer_piles", "Small_deer_piles")
+    ),
+    
+    reindeer_pellets_original = coalesce_existing(
+      .,
+      c("reindeer_pellets", "Reindeer_pellets", "reindeer_piles", "Reindeer_piles", "reindeer", "Reindeer")
     )
   )
 
+defec_rate <- list(
+  moose = 16.5,
+  red_deer = 19,
+  small_deer = 22
+)
+
+plot_area_m2 <- 38.48451
+K_plot <- 1000000 / plot_area_m2
+
+leaf_fall_doy <- function(lat) {
+  lat_ref <- c(56, 58, 60, 62, 64, 66)
+  doy_ref <- c(
+    as.numeric(format(as.Date("2024-10-25"), "%j")),
+    as.numeric(format(as.Date("2024-10-20"), "%j")),
+    as.numeric(format(as.Date("2024-10-15"), "%j")),
+    as.numeric(format(as.Date("2024-10-10"), "%j")),
+    as.numeric(format(as.Date("2024-10-05"), "%j")),
+    as.numeric(format(as.Date("2024-10-01"), "%j"))
+  )
+  
+  approx(lat_ref, doy_ref, xout = lat, rule = 2)$y
+}
 #=============================================================================
 # 10) COMPUTE PINE / SPRUCE / CONTORTA STEMS AND BROWSING PROPORTIONS
 #=============================================================================
@@ -639,26 +738,21 @@ abin_all <- add_damage_props(
 #=============================================================================
 
 # Which year column exists?
-if ("year" %in% names(abin_all)) {
-  year_col <- "year"
-} else if ("Year" %in% names(abin_all)) {
-  year_col <- "Year"
-} else {
-  stop("No year column found in abin_all")
-}
+year_col <- first_existing(c("year", "Year"), abin_all)
+if (is.na(year_col)) stop("No year column found in abin_all")
 
 abin_all[[year_col]] <- to_num(abin_all[[year_col]])
 
-# Historical columns if present
-hist_pine_stems_col <- if ("Pine_stems" %in% names(abin_all)) "Pine_stems" else NULL
-hist_pine_winter_n_col <- if ("Pine_Winter_Damage_Stems" %in% names(abin_all)) "Pine_Winter_Damage_Stems" else NULL
-hist_pine_winter_p_col <- if ("Proportion_Pine_Damage_Winter" %in% names(abin_all)) "Proportion_Pine_Damage_Winter" else NULL
+# Historical columns if present (accept either old or already-cleaned names)
+hist_pine_stems_col <- first_existing(c("Pine_stems", "pine_stems"), abin_all)
+hist_pine_winter_n_col <- first_existing(c("Pine_Winter_Damage_Stems", "pine_winter_damage_stems"), abin_all)
+hist_pine_winter_p_col <- first_existing(c("Proportion_Pine_Damage_Winter", "proportion_pine_damage_winter"), abin_all)
 
-hist_pine_summer_n_col <- if ("Pine_Summer_Damage_Stems" %in% names(abin_all)) "Pine_Summer_Damage_Stems" else NULL
-hist_pine_summer_p_col <- if ("Proportion_Pine_Damage_Summer" %in% names(abin_all)) "Proportion_Pine_Damage_Summer" else NULL
+hist_pine_summer_n_col <- first_existing(c("Pine_Summer_Damage_Stems", "pine_summer_damage_stems"), abin_all)
+hist_pine_summer_p_col <- first_existing(c("Proportion_Pine_Damage_Summer", "proportion_pine_damage_summer"), abin_all)
 
-hist_pine_yearly_n_col <- if ("Pine_Yearly_Damage_Stems" %in% names(abin_all)) "Pine_Yearly_Damage_Stems" else NULL
-hist_pine_yearly_p_col <- if ("Proportion_Pine_Damage_Yearly" %in% names(abin_all)) "Proportion_Pine_Damage_Yearly" else NULL
+hist_pine_yearly_n_col <- first_existing(c("Pine_Yearly_Damage_Stems", "pine_yearly_damage_stems"), abin_all)
+hist_pine_yearly_p_col <- first_existing(c("Proportion_Pine_Damage_Yearly", "proportion_pine_damage_yearly"), abin_all)
 
 for (nm in c(
   hist_pine_stems_col,
@@ -666,7 +760,9 @@ for (nm in c(
   hist_pine_summer_n_col, hist_pine_summer_p_col,
   hist_pine_yearly_n_col, hist_pine_yearly_p_col
 )) {
-  if (!is.null(nm)) abin_all[[nm]] <- to_num(abin_all[[nm]])
+  if (!is.na(nm) && nm %in% names(abin_all)) {
+    abin_all[[nm]] <- to_num(abin_all[[nm]])
+  }
 }
 
 # Identify pine combo columns
@@ -760,6 +856,49 @@ abin_all <- abin_all %>%
     )
   )
 
+# Safe historical fallback vectors
+hist_pine_stems_vec <- if (!is.na(hist_pine_stems_col) && hist_pine_stems_col %in% names(abin_all)) {
+  to_num(abin_all[[hist_pine_stems_col]])
+} else {
+  rep(NA_real_, nrow(abin_all))
+}
+
+hist_pine_winter_n_vec <- if (!is.na(hist_pine_winter_n_col) && hist_pine_winter_n_col %in% names(abin_all)) {
+  to_num(abin_all[[hist_pine_winter_n_col]])
+} else {
+  rep(NA_real_, nrow(abin_all))
+}
+
+hist_pine_winter_p_vec <- if (!is.na(hist_pine_winter_p_col) && hist_pine_winter_p_col %in% names(abin_all)) {
+  to_num(abin_all[[hist_pine_winter_p_col]])
+} else {
+  rep(NA_real_, nrow(abin_all))
+}
+
+hist_pine_summer_n_vec <- if (!is.na(hist_pine_summer_n_col) && hist_pine_summer_n_col %in% names(abin_all)) {
+  to_num(abin_all[[hist_pine_summer_n_col]])
+} else {
+  rep(NA_real_, nrow(abin_all))
+}
+
+hist_pine_summer_p_vec <- if (!is.na(hist_pine_summer_p_col) && hist_pine_summer_p_col %in% names(abin_all)) {
+  to_num(abin_all[[hist_pine_summer_p_col]])
+} else {
+  rep(NA_real_, nrow(abin_all))
+}
+
+hist_pine_yearly_n_vec <- if (!is.na(hist_pine_yearly_n_col) && hist_pine_yearly_n_col %in% names(abin_all)) {
+  to_num(abin_all[[hist_pine_yearly_n_col]])
+} else {
+  rep(NA_real_, nrow(abin_all))
+}
+
+hist_pine_yearly_p_vec <- if (!is.na(hist_pine_yearly_p_col) && hist_pine_yearly_p_col %in% names(abin_all)) {
+  to_num(abin_all[[hist_pine_yearly_p_col]])
+} else {
+  rep(NA_real_, nrow(abin_all))
+}
+
 # Use calculated values when detailed pine coding exists;
 # otherwise fall back to historical columns
 abin_all <- abin_all %>%
@@ -769,47 +908,48 @@ abin_all <- abin_all %>%
   mutate(
     pine_stems = case_when(
       has_detailed_pine ~ pine_stems_calc,
-      !is.null(hist_pine_stems_col) ~ to_num(.data[[hist_pine_stems_col]]),
+      !is.na(hist_pine_stems_vec) ~ hist_pine_stems_vec,
       TRUE ~ pine_stems_calc
     ),
     
     pine_winter_damage_stems = case_when(
       has_detailed_pine ~ pine_winter_damage_stems_calc,
-      !is.null(hist_pine_winter_n_col) ~ to_num(.data[[hist_pine_winter_n_col]]),
+      !is.na(hist_pine_winter_n_vec) ~ hist_pine_winter_n_vec,
       TRUE ~ pine_winter_damage_stems_calc
     ),
     
     pine_summer_damage_stems = case_when(
       has_detailed_pine ~ pine_summer_damage_stems_calc,
-      !is.null(hist_pine_summer_n_col) ~ to_num(.data[[hist_pine_summer_n_col]]),
+      !is.na(hist_pine_summer_n_vec) ~ hist_pine_summer_n_vec,
       TRUE ~ NA_real_
     ),
     
     pine_yearly_damage_stems = case_when(
       has_detailed_pine ~ pmax(pine_yearly_damage_stems_calc, pine_winter_damage_stems, na.rm = TRUE),
+      !is.na(hist_pine_yearly_n_vec) ~ pmax(hist_pine_yearly_n_vec, pine_winter_damage_stems, na.rm = TRUE),
       !is.na(pine_winter_damage_stems) ~ pine_winter_damage_stems,
       TRUE ~ NA_real_
     ),
     
     proportion_pine_damage_winter = case_when(
       has_detailed_pine ~ proportion_pine_damage_winter_calc,
-      !is.null(hist_pine_winter_p_col) ~ to_num(.data[[hist_pine_winter_p_col]]),
+      !is.na(hist_pine_winter_p_vec) ~ hist_pine_winter_p_vec,
       TRUE ~ proportion_pine_damage_winter_calc
     ),
     
     proportion_pine_damage_summer = case_when(
       has_detailed_pine ~ proportion_pine_damage_summer_calc,
-      !is.null(hist_pine_summer_p_col) ~ to_num(.data[[hist_pine_summer_p_col]]),
+      !is.na(hist_pine_summer_p_vec) ~ hist_pine_summer_p_vec,
       TRUE ~ NA_real_
     ),
     
-    proportion_pine_damage_yearly = if_else(
-      !is.na(pine_stems) & pine_stems > 0,
-      pine_yearly_damage_stems / pine_stems,
-      NA_real_
+    proportion_pine_damage_yearly = case_when(
+      !is.na(pine_stems) & pine_stems > 0 & !is.na(pine_yearly_damage_stems) ~
+        pine_yearly_damage_stems / pine_stems,
+      !is.na(hist_pine_yearly_p_vec) ~ hist_pine_yearly_p_vec,
+      TRUE ~ NA_real_
     )
   )
-
 #=============================================================================
 # 11B) STANDARDISE FINAL PINE PROPORTIONS TO 0-1 SCALE
 #=============================================================================
@@ -857,6 +997,11 @@ summary(abin_all$proportion_pine_damage_winter[abin_all[[year_col]] < 2025])
 names(abin_all) <- clean_names_basic(names(abin_all))
 names(abin_all) <- tolower(names(abin_all))
 
+
+#=============================================================================
+# 12B) FINAL PELLET REPAIR AFTER NAME CLEANING
+#=============================================================================
+
 #=============================================================================
 # 13) MERGE DUPLICATE COLUMN NAMES CREATED BY NAME CLEANING
 #=============================================================================
@@ -871,6 +1016,250 @@ if (length(dup_after) == 0) {
   print(dup_after)
 }
 
+#=============================================================================
+#=============================================================================
+# 13B) FINAL PELLET STANDARDISATION AFTER NAME CLEANING + DUPLICATE MERGE
+#=============================================================================
+
+area_lat <- tibble::tribble(
+  ~area,                 ~lat_mean,            ~lon_mean,
+  "Fredrika",            64.2056,              18.7331,
+  "Furudal",             61.4302,              15.1002,
+  "Lofsdalen",           62.08458141582506,    NA_real_,
+  "Ljusdal",             61.9583,              15.3818,
+  "Lycksele",            64.6845,              18.1589,
+  "Nordmaling",          63.6590,              19.6754,
+  "Råneå",               66.2720,              21.3994,
+  "Sorsele",             65.6100,              17.5919,
+  "Växjö",               57.1893,              14.6869,
+  "Åtvidaberg",          58.3171,              15.7491,
+  "OsterMalma",          58.7000,              17.0912,
+  "Barksätter",          58.97757317897449,    NA_real_,
+  "Malå",                65.20166947906844,    NA_real_
+)
+
+pellet_years <- c(2022, 2023, 2024, 2025)
+
+abin_all <- abin_all %>%
+  mutate(
+    area = as.character(area),
+    year = to_num(year),
+    date = parse_abin_date(date),
+    
+    area = recode(
+      area,
+      "om" = "OsterMalma",
+      "at" = "Åtvidaberg",
+      "vx" = "Växjö",
+      "bk" = "Barksätter",
+      "fk" = "Fredrika",
+      "fu" = "Furudal",
+      "lf" = "Lofsdalen",
+      "lj" = "Ljusdal",
+      "ly" = "Lycksele",
+      "ma" = "Malå",
+      "no" = "Nordmaling",
+      "ra" = "Råneå",
+      "so" = "Sorsele",
+      "Öster Malma" = "OsterMalma",
+      "ÖsterMalma" = "OsterMalma",
+      "Oster Malma" = "OsterMalma",
+      "Raaneaa" = "Råneå",
+      "Raanea" = "Råneå",
+      "Ranea" = "Råneå",
+      "Lyksele" = "Lycksele",
+      "Växjo" = "Växjö",
+      "Fågelåsen" = "Lofsdalen",
+      "Furudal_Kontroll" = "Furudal",
+      "Sorsele_Kontroll" = "Sorsele",
+      "Råneå_Kontroll" = "Råneå",
+      .default = area
+    )
+  ) %>%
+  select(-any_of(c("lat_mean", "lon_mean"))) %>%
+  left_join(area_lat, by = "area") %>%
+  mutate(
+    #--------------------------------------------------
+    # 1) Coalesce raw pellet columns from all possible names
+    #--------------------------------------------------
+    moose_pellets_original = coalesce_existing(
+      .,
+      c("moose_pellets_original", "moose_pellets", "moose_piles")
+    ),
+    
+    red_deer_pellets_original = coalesce_existing(
+      .,
+      c("red_deer_pellets_original", "red_deer_pellets", "red_deer_piles")
+    ),
+    
+    small_deer_pellets_original = coalesce_existing(
+      .,
+      c("small_deer_pellets_original", "small_deer_pellets", "small_deer_piles")
+    ),
+    
+    reindeer_pellets_original = coalesce_existing(
+      .,
+      c("reindeer_pellets_original", "reindeer_pellets", "reindeer_piles", "reindeer")
+    ),
+    
+    #--------------------------------------------------
+    # 2) Treat NA as zero ONLY in years where pellet data was collected
+    #    Keep other years as NA because pellets were not part of the data
+    #--------------------------------------------------
+    moose_pellets_original = if_else(
+      year %in% pellet_years,
+      if_else(is.na(moose_pellets_original), 0, moose_pellets_original),
+      NA_real_
+    ),
+    
+    red_deer_pellets_original = if_else(
+      year %in% pellet_years,
+      if_else(is.na(red_deer_pellets_original), 0, red_deer_pellets_original),
+      NA_real_
+    ),
+    
+    small_deer_pellets_original = if_else(
+      year %in% pellet_years,
+      if_else(is.na(small_deer_pellets_original), 0, small_deer_pellets_original),
+      NA_real_
+    ),
+    
+    reindeer_pellets_original = if_else(
+      year %in% pellet_years,
+      if_else(is.na(reindeer_pellets_original), 0, reindeer_pellets_original),
+      NA_real_
+    ),
+    
+    #--------------------------------------------------
+    # 3) Time-window correction
+    #--------------------------------------------------
+    days_since_jan = as.numeric(date - as.Date(paste0(year, "-01-01"))) + 1,
+    
+    start_doy = leaf_fall_doy(lat_mean),
+    start_date = as.Date(paste0(year - 1L, "-01-01")) + round(start_doy) - 1L,
+    
+    t_days = as.numeric(date - start_date),
+    t_days = if_else(!is.na(t_days) & t_days <= 0, NA_real_, t_days),
+    
+    #--------------------------------------------------
+    # 4) Corrected pellet densities
+    #--------------------------------------------------
+    moose_pellets = if_else(
+      !is.na(moose_pellets_original) & !is.na(t_days),
+      (moose_pellets_original * K_plot) / (defec_rate$moose * t_days),
+      NA_real_
+    ),
+    
+    red_deer_pellets = if_else(
+      !is.na(red_deer_pellets_original) & !is.na(t_days),
+      (red_deer_pellets_original * K_plot) / (defec_rate$red_deer * t_days),
+      NA_real_
+    ),
+    
+    small_deer_pellets = if_else(
+      !is.na(small_deer_pellets_original) & !is.na(t_days),
+      (small_deer_pellets_original * K_plot) / (defec_rate$small_deer * t_days),
+      NA_real_
+    ),
+    
+    reindeer_pellets = reindeer_pellets_original,
+    
+    #--------------------------------------------------
+    # 5) Presence/absence variables for modelling
+    #--------------------------------------------------
+    moose_present = if_else(
+      !is.na(moose_pellets_original) & moose_pellets_original > 0,
+      1, 0,
+      missing = NA_real_
+    ),
+    
+    red_deer_present = if_else(
+      !is.na(red_deer_pellets_original) & red_deer_pellets_original > 0,
+      1, 0,
+      missing = NA_real_
+    ),
+    
+    small_deer_present = if_else(
+      !is.na(small_deer_pellets_original) & small_deer_pellets_original > 0,
+      1, 0,
+      missing = NA_real_
+    ),
+    
+    reindeer_present = if_else(
+      !is.na(reindeer_pellets_original) & reindeer_pellets_original > 0,
+      1, 0,
+      missing = NA_real_
+    ),
+    
+    #--------------------------------------------------
+    # 6) Log and combined pellet variables
+    #--------------------------------------------------
+    moose_pellets_only = moose_pellets,
+    moose_pellets_log = log1p(moose_pellets),
+    
+    deer_pellets = rowSums_keepNA_df(
+      tibble::tibble(
+        red_deer_pellets = red_deer_pellets,
+        small_deer_pellets = small_deer_pellets,
+        reindeer_pellets = reindeer_pellets
+      )
+    ),
+    
+    deer_present = if_else(
+      !is.na(deer_pellets) & deer_pellets > 0,
+      1, 0,
+      missing = NA_real_
+    ),
+    
+    deer_pellets_log = log1p(deer_pellets),
+    
+    total_cervid_pellets = rowSums_keepNA_df(
+      tibble::tibble(
+        moose_pellets = moose_pellets,
+        red_deer_pellets = red_deer_pellets,
+        small_deer_pellets = small_deer_pellets,
+        reindeer_pellets = reindeer_pellets
+      )
+    ),
+    
+    cervid_present = if_else(
+      !is.na(total_cervid_pellets) & total_cervid_pellets > 0,
+      1, 0,
+      missing = NA_real_
+    ),
+    
+    total_cervid_pellets_log = log1p(total_cervid_pellets)
+  )
+
+cat("\n--- FINAL PELLET QC AFTER FINAL STANDARDISATION ---\n")
+
+print(
+  abin_all %>%
+    group_by(year) %>%
+    summarise(
+      n = n(),
+      raw_moose_sum = sum(moose_pellets_original, na.rm = TRUE),
+      corrected_moose_sum = sum(moose_pellets, na.rm = TRUE),
+      raw_red_deer_sum = sum(red_deer_pellets_original, na.rm = TRUE),
+      corrected_red_deer_sum = sum(red_deer_pellets, na.rm = TRUE),
+      raw_small_deer_sum = sum(small_deer_pellets_original, na.rm = TRUE),
+      corrected_small_deer_sum = sum(small_deer_pellets, na.rm = TRUE),
+      reindeer_sum = sum(reindeer_pellets, na.rm = TRUE),
+      total_sum = sum(total_cervid_pellets, na.rm = TRUE),
+      n_moose_zero = sum(moose_pellets_original == 0, na.rm = TRUE),
+      n_moose_positive = sum(moose_pellets_original > 0, na.rm = TRUE),
+      n_moose_na = sum(is.na(moose_pellets_original)),
+      n_with_date = sum(!is.na(date)),
+      n_with_days_since_jan = sum(!is.na(days_since_jan)),
+      n_with_t_days = sum(!is.na(t_days)),
+      min_date = if_else(all(is.na(date)), as.Date(NA), min(date, na.rm = TRUE)),
+      max_date = if_else(all(is.na(date)), as.Date(NA), max(date, na.rm = TRUE)),
+      min_t_days = if_else(all(is.na(t_days)), NA_real_, min(t_days, na.rm = TRUE)),
+      max_t_days = if_else(all(is.na(t_days)), NA_real_, max(t_days, na.rm = TRUE)),
+      .groups = "drop"
+    ),
+  width = Inf
+)
 #=============================================================================
 # 14) STANDARDISE FINAL CORE COLUMN NAMES
 #=============================================================================
@@ -1034,7 +1423,14 @@ compact_keep <- intersect(
     "red_deer_pellets",
     "small_deer_pellets",
     "reindeer_pellets",
-    "wild_boar"
+    "wild_boar",
+    
+    "moose_pellets_only",
+    "moose_pellets_log",
+    "deer_pellets",
+    "deer_pellets_log",
+    "total_cervid_pellets",
+    "total_cervid_pellets_log"
   ),
   names(abin_all)
 )
@@ -1042,8 +1438,16 @@ compact_keep <- intersect(
 abin_compact <- abin_all %>%
   select(all_of(compact_keep))
 
-write_csv(abin_compact, "abin_compact.csv")
-write_xlsx(abin_compact, "abin_compact.xlsx")
+write_csv(
+  abin_compact,
+  "C:/Users/shge0002/Documents/R/R/ÄBIN2025raw/2025-BINdata_raw/abin_compact.csv"
+)
+
+write_xlsx(
+  abin_compact,
+  "C:/Users/shge0002/Documents/R/R/ÄBIN2025raw/2025-BINdata_raw/abin_compact.xlsx"
+)
+
 #=============================================================================
 # 18) EXPORT
 #=============================================================================
@@ -1051,8 +1455,15 @@ write_xlsx(abin_compact, "abin_compact.xlsx")
 write_csv(abin_all, "abin2008_2025_full.csv")
 write_xlsx(abin_all, "abin2008_2025_full.xlsx")
 
-write_csv(abin_compact, "abin_compact.csv")
-write_xlsx(abin_compact, "abin_compact.xlsx")
+write_csv(
+  abin_compact,
+  "C:/Users/shge0002/Documents/R/R/ÄBIN2025raw/2025-BINdata_raw/abin_compact.csv"
+)
+
+write_xlsx(
+  abin_compact,
+  "C:/Users/shge0002/Documents/R/R/ÄBIN2025raw/2025-BINdata_raw/abin_compact.xlsx"
+)
 
 cat("\nDone.\n")
 cat("Saved:\n")
@@ -1094,4 +1505,6 @@ cat("yearly > stems: ",
 
 cat("yearly < winter: ",
     sum(abin_all$pine_yearly_damage_stems < abin_all$pine_winter_damage_stems, na.rm = TRUE), "\n")
+
+
 

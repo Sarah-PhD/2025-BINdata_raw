@@ -1,0 +1,4 @@
+"Model","Formula"
+"Original model","damage_N ~ species * prop_s_plot + species * north_c + species *      stem_count_c + species * height_c + year + (1 | area) + (1 |      stand_id)"
+"Only No PCT plots","damage_N ~ species * prop_s_plot + species * north_c + species *      stem_count_c + species * height_c + year + (1 | area) + (1 |      stand_id)"
+"PCT included as factor","damage_N ~ species * prop_s_plot + species * north_c + species *      stem_count_c + species * height_c + pct + year + (1 | area) +      (1 | stand_id)"
