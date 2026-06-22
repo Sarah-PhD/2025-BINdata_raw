@@ -1507,4 +1507,140 @@ cat("yearly < winter: ",
     sum(abin_all$pine_yearly_damage_stems < abin_all$pine_winter_damage_stems, na.rm = TRUE), "\n")
 
 
+### 
+#Add another cleaner ÄBIN for reference sending to others )dont wanna change the äbin 
+# all file incase I disrupt later analysis
+#=============================================================================
+# 15B) CREATE CLEAN / REORDERED COPY
+# Keeps abin_all unchanged
+#=============================================================================
 
+abin_clean_ordered <- abin_all
+
+pine_combo_cols <- names(abin_clean_ordered)[
+  stringr::str_detect(
+    names(abin_clean_ordered),
+    "^pine_((fb|fs|fts|od|o|ps|ss|ub)(,|$))+$"
+  )
+]
+
+pine_core <- c(
+  "pine_stems",
+  "pine_unbrowsed",
+  "pine_winter_damage_stems",
+  "proportion_pine_damage_winter",
+  "pine_summer_damage_stems",
+  "proportion_pine_damage_summer",
+  "pine_yearly_damage_stems",
+  "proportion_pine_damage_yearly",
+  "pine_rebrowsed_stems",
+  "pine_rebrowsing_prop"
+)
+
+pine_2025_summary <- c(
+  "pine_damage_events_2025",
+  "pine_severity_sum_2025",
+  "pine_severity_mean_2025",
+  "pine_n_trees_2025",
+  "pine_severe_n_2025",
+  "pine_stems_lthh_2025",
+  "pine_browsed_lthh_2025"
+)
+
+pine_other <- names(abin_clean_ordered)[
+  stringr::str_detect(names(abin_clean_ordered), "^pine_") &
+    !names(abin_clean_ordered) %in% c(pine_core, pine_combo_cols, pine_2025_summary)
+]
+
+spruce_cols   <- names(abin_clean_ordered)[stringr::str_detect(names(abin_clean_ordered), "^spruce_|^total_spruce")]
+contorta_cols <- names(abin_clean_ordered)[stringr::str_detect(names(abin_clean_ordered), "^contorta_|^total_contorta")]
+larch_cols    <- names(abin_clean_ordered)[stringr::str_detect(names(abin_clean_ordered), "^larch_")]
+
+birch_cols <- names(abin_clean_ordered)[
+  stringr::str_detect(names(abin_clean_ordered), "^downy_|^silver_")
+]
+
+broadleaf_cols <- names(abin_clean_ordered)[
+  stringr::str_detect(names(abin_clean_ordered), "^rowan_|^aspen_|^salix_|^oak_")
+]
+
+pellet_cols <- c(
+  "moose_pellets_original",
+  "red_deer_pellets_original",
+  "small_deer_pellets_original",
+  "reindeer_pellets_original",
+  "moose_pellets",
+  "red_deer_pellets",
+  "small_deer_pellets",
+  "reindeer_pellets",
+  "moose_present",
+  "red_deer_present",
+  "small_deer_present",
+  "reindeer_present",
+  "moose_pellets_only",
+  "moose_pellets_log",
+  "deer_pellets",
+  "deer_present",
+  "deer_pellets_log",
+  "total_cervid_pellets",
+  "cervid_present",
+  "total_cervid_pellets_log",
+  "wild_boar"
+)
+
+site_cols <- c(
+  "area", "year", "surveyor", "date", "stand", "plot",
+  "age", "pct", "half_height", "average_height_m",
+  "north", "east", "x_y", "y_y",
+  "nearest_tract", "productivity",
+  "lat_mean", "lon_mean",
+  "days_since_jan", "start_doy", "start_date", "t_days"
+)
+
+notes_cols <- c(
+  "comments",
+  "stand_no_connect",
+  "stand_name_repeat1",
+  "na"
+)
+
+ordered_cols <- c(
+  site_cols,
+  pine_core,
+  sort(pine_combo_cols),
+  pine_2025_summary,
+  sort(pine_other),
+  sort(spruce_cols),
+  sort(contorta_cols),
+  sort(larch_cols),
+  sort(birch_cols),
+  sort(broadleaf_cols),
+  pellet_cols,
+  notes_cols
+)
+
+ordered_cols <- intersect(ordered_cols, names(abin_clean_ordered))
+remaining_cols <- setdiff(names(abin_clean_ordered), ordered_cols)
+
+abin_clean_ordered <- abin_clean_ordered %>%
+  select(all_of(ordered_cols), all_of(remaining_cols))
+
+#=============================================================================
+# REMOVE REDUNDANT COLUMNS FROM CLEAN VERSION ONLY
+#=============================================================================
+
+abin_clean_ordered <- abin_clean_ordered %>%
+  select(
+    -any_of(c(
+      "moose_piles",
+      "red_deer_piles",
+      "small_deer_piles",
+      "reindeer_piles",
+      "na",
+      "x_y",
+       "y_y"                           # if confirmed useless
+    ))
+  )
+# Optional exports
+write_csv(abin_clean_ordered, "abin2008_2025_clean_ordered.csv")
+write_xlsx(abin_clean_ordered, "abin2008_2025_clean_ordered.xlsx")
