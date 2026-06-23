@@ -1,0 +1,5 @@
+"grp","var1","var2","vcov","sdcor"
+"plot_id:(stand_id:area)","(Intercept)",NA,12.5725762931744,3.54578288861211
+"stand_id:area","(Intercept)",NA,118.984637841598,10.9080079685338
+"area","(Intercept)",NA,96.171439682813,9.80670381335202
+"Residual",NA,NA,277.28526542354,16.6518847408796

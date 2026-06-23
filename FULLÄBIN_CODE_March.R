@@ -1644,3 +1644,174 @@ abin_clean_ordered <- abin_clean_ordered %>%
 # Optional exports
 write_csv(abin_clean_ordered, "abin2008_2025_clean_ordered.csv")
 write_xlsx(abin_clean_ordered, "abin2008_2025_clean_ordered.xlsx")
+
+#=============================================================================
+# CREATE RAW VERSION
+# Keeps abin_all unchanged
+# Keeps pine_stems, spruce_stems, contorta_stems
+# Renames pellet columns
+# Groups pine_stems, pine_unbrowsed, and pine damage columns together
+# Puts key site columns first and comments last
+#=============================================================================
+
+abin_raw <- abin_all
+
+#--------------------------------------------------
+# Rename pellet columns
+#--------------------------------------------------
+
+names(abin_raw)[names(abin_raw) == "moose_pellets_original"] <- "moose_pellets_raw"
+names(abin_raw)[names(abin_raw) == "red_deer_pellets_original"] <- "red_deer_pellets_raw"
+names(abin_raw)[names(abin_raw) == "small_deer_pellets_original"] <- "small_deer_pellets_raw"
+names(abin_raw)[names(abin_raw) == "reindeer_pellets_original"] <- "reindeer_pellets_raw"
+
+names(abin_raw)[names(abin_raw) == "moose_pellets"] <- "moose_pellets_corrected"
+names(abin_raw)[names(abin_raw) == "red_deer_pellets"] <- "red_deer_pellets_corrected"
+names(abin_raw)[names(abin_raw) == "small_deer_pellets"] <- "small_deer_pellets_corrected"
+names(abin_raw)[names(abin_raw) == "reindeer_pellets"] <- "reindeer_pellets_corrected"
+
+#--------------------------------------------------
+# Columns to remove
+#--------------------------------------------------
+
+drop_cols <- c(
+  "moose_piles", "red_deer_piles", "small_deer_piles", "reindeer_piles",
+  
+  "x_y", "y_y", "x_x", "y_x",
+  "x.x", "y.x", "x.y", "y.y",
+  
+  "moose_present", "red_deer_present", "small_deer_present",
+  "reindeer_present", "deer_present", "cervid_present",
+  
+  "moose_pellets_log", "deer_pellets_log", "total_cervid_pellets_log",
+  "moose_pellets_only", "deer_pellets", "total_cervid_pellets",
+  
+  "lat_mean", "lon_mean", "days_since_jan", "start_doy", "start_date", "t_days",
+  
+  "pine_winter_damage_stems",
+  "pine_summer_damage_stems",
+  "pine_yearly_damage_stems",
+  "proportion_pine_damage_winter",
+  "proportion_pine_damage_summer",
+  "proportion_pine_damage_yearly",
+  "pine_rebrowsed_stems",
+  "pine_rebrowsing_prop",
+  "pine_winter_damage_prop",
+  "pine_summer_damage_prop",
+  "pine_winter_damage_stems_no_ss",
+  "proportion_pine_damage_winter_no_ss",
+  "pine_summer_damage_stems_no_ss",
+  "proportion_pine_damage_summer_no_ss",
+  "pine_yearly_damage_stems_no_ss",
+  "proportion_pine_damage_yearly_no_ss",
+  "pine_damages_no_wts",
+  "pine_damages_with_ss",
+  "fresh_damage",
+  "rebrows",
+  
+  "spruce_winter_damage_stems",
+  "spruce_winter_damage_prop",
+  "spruce_summer_damage_stems",
+  "spruce_summer_damage_prop",
+  "spruce_rebrowsed_stems",
+  "spruce_rebrowsing_prop",
+  
+  "contorta_winter_damage_stems",
+  "contorta_winter_damage_prop",
+  "contorta_summer_damage_stems",
+  "contorta_summer_damage_prop",
+  "contorta_rebrowsed_stems",
+  "contorta_rebrowsing_prop",
+  
+  "pine_damage_events_2025",
+  "pine_severity_sum_2025",
+  "pine_severity_mean_2025",
+  "pine_n_trees_2025",
+  "pine_severe_n_2025",
+  "pine_stems_lthh_2025",
+  "pine_browsed_lthh_2025",
+  
+  "contorta_damage_events_2025",
+  "contorta_severity_sum_2025",
+  "contorta_severity_mean_2025",
+  "contorta_n_trees_2025",
+  "contorta_severe_n_2025",
+  "contorta_stems_lthh_2025",
+  "contorta_browsed_lthh_2025",
+  
+  "na"
+)
+
+#--------------------------------------------------
+# Remove columns
+#--------------------------------------------------
+
+abin_raw <- abin_raw[, !(names(abin_raw) %in% drop_cols)]
+
+#--------------------------------------------------
+# Reorder columns
+#--------------------------------------------------
+
+start_cols <- c(
+  "area", "year", "surveyor", "date", "stand", "plot",
+  "age", "pct", "half_height", "average_height_m",
+  "north", "east", "nearest_tract", "productivity"
+)
+
+pine_damage_cols <- names(abin_raw)[
+  grepl(
+    "^pine_((fb|fs|fts|od|o|ps|ss)(,|$))+$",
+    names(abin_raw)
+  )
+]
+
+pine_group <- c(
+  "pine_stems",
+  "pine_unbrowsed",
+  sort(pine_damage_cols)
+)
+
+end_cols <- c("comments")
+
+start_cols <- intersect(start_cols, names(abin_raw))
+pine_group <- intersect(pine_group, names(abin_raw))
+end_cols <- intersect(end_cols, names(abin_raw))
+
+middle_cols <- setdiff(
+  names(abin_raw),
+  c(start_cols, pine_group, end_cols)
+)
+
+abin_raw <- abin_raw[, c(start_cols, pine_group, middle_cols, end_cols)]
+
+#--------------------------------------------------
+# Check
+#--------------------------------------------------
+
+cat("Columns in abin_all:", ncol(abin_all), "\n")
+cat("Columns in abin_raw:", ncol(abin_raw), "\n")
+
+cat("\nFirst columns are:\n")
+print(names(abin_raw)[1:min(14, ncol(abin_raw))])
+
+cat("\nPine columns are:\n")
+print(names(abin_raw)[grepl("^pine_", names(abin_raw))])
+
+cat("\nLast column is:\n")
+print(tail(names(abin_raw), 1))
+
+#--------------------------------------------------
+# Save
+#--------------------------------------------------
+
+write.csv(
+  abin_raw,
+  "abin2008_2025_raw.csv",
+  row.names = FALSE
+)
+
+writexl::write_xlsx(
+  abin_raw,
+  "abin2008_2025_raw.xlsx"
+)
+

@@ -1,0 +1,4 @@
+"contrast","region","estimate","SE","df","t.ratio","p.value"
+"Downy - Silver","South",29.72,8.32,779.492480562654,3.57,0.000374
+"Downy - Silver","Centre",-1.28,8.15,782.248781896025,-0.16,0.875
+"Downy - Silver","North",3.45,5.46,779.491984245442,0.63,0.528
