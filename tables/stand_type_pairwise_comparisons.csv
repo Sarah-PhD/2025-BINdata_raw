@@ -1,0 +1,16 @@
+"contrast","estimate","SE","df","t.ratio","p.value"
+"Downy Downy only - Silver Downy only",NA,NA,NA,NA,NA
+"Downy Downy only - Downy Mixed",-4.78811846876797,2.16509172973999,809.021182234102,-2.21150836382484,0.12093904625015
+"Downy Downy only - Silver Mixed",-8.73866743582584,2.21990766504887,810.107428003255,-3.9365004109905,0.000519783232051707
+"Downy Downy only - Downy Silver only",NA,NA,NA,NA,NA
+"Downy Downy only - Silver Silver only",-9.4487407253786,2.89066730573248,811.982841786087,-3.26870570910766,0.00618243970245314
+"Silver Downy only - Downy Mixed",NA,NA,NA,NA,NA
+"Silver Downy only - Silver Mixed",NA,NA,NA,NA,NA
+"Silver Downy only - Downy Silver only",NA,NA,NA,NA,NA
+"Silver Downy only - Silver Silver only",NA,NA,NA,NA,NA
+"Downy Mixed - Silver Mixed",-3.95054896705787,1.4143435109873,801.275600736601,-2.79320330341824,0.027356191443631
+"Downy Mixed - Downy Silver only",NA,NA,NA,NA,NA
+"Downy Mixed - Silver Silver only",-4.66062225661063,2.26870709987261,811.628653260849,-2.05430760844903,0.169225771092701
+"Silver Mixed - Downy Silver only",NA,NA,NA,NA,NA
+"Silver Mixed - Silver Silver only",-0.710073289552762,2.27918504681447,811.0872757453,-0.311547011307925,0.989517269731189
+"Downy Silver only - Silver Silver only",NA,NA,NA,NA,NA

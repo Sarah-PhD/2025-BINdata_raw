@@ -1,7 +1,7 @@
 "region","species","n_observations","n_stands","mean_damage","se_damage","mean_stems","total_stems"
-"South","Downy",315,52,16.21,1.48,9.88,3112
+"South","Downy",314,52,16.26,1.48,9.91,3112
 "South","Silver",780,92,12.18,0.71,10.92,8517
 "Centre","Downy",525,67,8.11,0.66,10.3,5408
 "Centre","Silver",392,52,17.08,1.15,8.2,3216
 "North","Downy",1284,146,12.83,0.57,16.34,20979
-"North","Silver",641,101,25.65,1.02,8.57,5495
+"North","Silver",640,101,25.69,1.02,8.59,5495

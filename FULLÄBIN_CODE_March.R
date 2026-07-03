@@ -1708,6 +1708,9 @@ drop_cols <- c(
   "pine_damages_with_ss",
   "fresh_damage",
   "rebrows",
+  "pine_browsed_<_hh",	
+  "pine_unbrowsed_<_hh",
+  "pine_<_hh",
   
   "spruce_winter_damage_stems",
   "spruce_winter_damage_prop",
@@ -1715,6 +1718,9 @@ drop_cols <- c(
   "spruce_summer_damage_prop",
   "spruce_rebrowsed_stems",
   "spruce_rebrowsing_prop",
+  "proportion_spruce_winter_damage",
+  "spruce_winter_damage",
+  "total_spruce_2025",
   
   "contorta_winter_damage_stems",
   "contorta_winter_damage_prop",
@@ -1738,6 +1744,7 @@ drop_cols <- c(
   "contorta_severe_n_2025",
   "contorta_stems_lthh_2025",
   "contorta_browsed_lthh_2025",
+  "total_contorta_2025",
   
   "na"
 )
@@ -1784,34 +1791,143 @@ middle_cols <- setdiff(
 
 abin_raw <- abin_raw[, c(start_cols, pine_group, middle_cols, end_cols)]
 
-#--------------------------------------------------
-# Check
-#--------------------------------------------------
-
-cat("Columns in abin_all:", ncol(abin_all), "\n")
-cat("Columns in abin_raw:", ncol(abin_raw), "\n")
-
-cat("\nFirst columns are:\n")
-print(names(abin_raw)[1:min(14, ncol(abin_raw))])
-
-cat("\nPine columns are:\n")
-print(names(abin_raw)[grepl("^pine_", names(abin_raw))])
-
-cat("\nLast column is:\n")
-print(tail(names(abin_raw), 1))
+#=============================================================================
+# FINAL RAW + SHARE RAW ORDERING AND EXPORT
+#=============================================================================
 
 #--------------------------------------------------
-# Save
+# 1) Rename spruce columns BEFORE final ordering
 #--------------------------------------------------
 
-write.csv(
-  abin_raw,
-  "abin2008_2025_raw.csv",
-  row.names = FALSE
+spruce_name_fix <- c(
+  "o,spruce_fts" = "spruce_fts,o",
+  "o,spruce_od"  = "spruce_od,o",
+  "o,spruce_ub"  = "spruce_ub,o",
+  "od,spruce_fs" = "spruce_fs,od",
+  "od,spruce_o"  = "spruce_o,od"
 )
 
-writexl::write_xlsx(
-  abin_raw,
-  "abin2008_2025_raw.xlsx"
+names(abin_raw) <- dplyr::recode(
+  names(abin_raw),
+  !!!spruce_name_fix,
+  .default = names(abin_raw)
 )
+
+#--------------------------------------------------
+# 2) Recalculate column groups AFTER spruce renaming
+#--------------------------------------------------
+
+start_cols <- c(
+  "area", "year", "surveyor", "date", "stand", "plot",
+  "age", "pct", "half_height", "average_height_m",
+  "north", "east", "nearest_tract", "productivity"
+)
+
+pine_damage_cols <- names(abin_raw)[
+  grepl("^pine_((fb|fs|fts|od|o|ps|ss|ub)(,|$))+$", names(abin_raw))
+]
+
+pine_group <- c(
+  "pine_stems",
+  "pine_unbrowsed",
+  sort(pine_damage_cols)
+)
+
+spruce_group <- names(abin_raw)[grepl("^spruce_", names(abin_raw))]
+contorta_group <- names(abin_raw)[grepl("^contorta_", names(abin_raw))]
+larch_group <- names(abin_raw)[grepl("^larch_", names(abin_raw))]
+
+birch_group <- names(abin_raw)[grepl("^downy_|^silver_", names(abin_raw))]
+
+broadleaf_group <- names(abin_raw)[
+  grepl("^rowan_|^aspen_|^salix_|^oak_", names(abin_raw))
+]
+
+pellet_group <- names(abin_raw)[
+  grepl("pellets|reindeer|wild_boar|moose_density", names(abin_raw))
+]
+
+end_cols <- c("comments")
+
+start_cols <- intersect(start_cols, names(abin_raw))
+pine_group <- intersect(pine_group, names(abin_raw))
+spruce_group <- intersect(sort(spruce_group), names(abin_raw))
+contorta_group <- intersect(sort(contorta_group), names(abin_raw))
+larch_group <- intersect(sort(larch_group), names(abin_raw))
+birch_group <- intersect(sort(birch_group), names(abin_raw))
+broadleaf_group <- intersect(sort(broadleaf_group), names(abin_raw))
+pellet_group <- intersect(sort(pellet_group), names(abin_raw))
+end_cols <- intersect(end_cols, names(abin_raw))
+
+ordered_cols <- c(
+  start_cols,
+  pine_group,
+  spruce_group,
+  contorta_group,
+  larch_group,
+  birch_group,
+  broadleaf_group,
+  pellet_group,
+  end_cols
+)
+
+middle_cols <- setdiff(names(abin_raw), ordered_cols)
+
+abin_raw <- abin_raw[, c(ordered_cols, middle_cols)]
+
+#--------------------------------------------------
+# 3) Create analysis and share versions
+#--------------------------------------------------
+
+abin_analysis <- abin_all
+abin_share_raw <- abin_raw
+
+#--------------------------------------------------
+# 4) Rename pellet columns in share file only
+#--------------------------------------------------
+
+names(abin_share_raw)[names(abin_share_raw) == "moose_pellets_original"] <- "moose_pellets_raw"
+names(abin_share_raw)[names(abin_share_raw) == "red_deer_pellets_original"] <- "red_deer_pellets_raw"
+names(abin_share_raw)[names(abin_share_raw) == "small_deer_pellets_original"] <- "small_deer_pellets_raw"
+names(abin_share_raw)[names(abin_share_raw) == "reindeer_pellets_original"] <- "reindeer_pellets_raw"
+
+names(abin_share_raw)[names(abin_share_raw) == "moose_pellets"] <- "moose_pellets_corrected"
+names(abin_share_raw)[names(abin_share_raw) == "red_deer_pellets"] <- "red_deer_pellets_corrected"
+names(abin_share_raw)[names(abin_share_raw) == "small_deer_pellets"] <- "small_deer_pellets_corrected"
+names(abin_share_raw)[names(abin_share_raw) == "reindeer_pellets"] <- "reindeer_pellets_corrected"
+
+#--------------------------------------------------
+# 5) Remove helper columns from share file only
+#--------------------------------------------------
+
+abin_share_raw <- abin_share_raw %>%
+  select(-any_of(drop_cols))
+
+#--------------------------------------------------
+# 6) Save
+#--------------------------------------------------
+
+write_csv(abin_analysis, "abin2008_2025_analysis.csv")
+write_xlsx(abin_analysis, "abin2008_2025_analysis.xlsx")
+
+write_csv(abin_raw, "abin2008_2025_raw.csv")
+write_xlsx(abin_raw, "abin2008_2025_raw.xlsx")
+
+write_csv(abin_share_raw, "abin2008_2025_share_raw.csv")
+write_xlsx(abin_share_raw, "abin2008_2025_share_raw.xlsx")
+
+#--------------------------------------------------
+# 7) Checks
+#--------------------------------------------------
+
+cat("\nOld bad spruce names still present in share file:\n")
+print(intersect(names(abin_share_raw), names(spruce_name_fix)))
+
+cat("\nCorrected spruce names present in share file:\n")
+print(intersect(names(abin_share_raw), unname(spruce_name_fix)))
+
+cat("\nFirst 30 columns in share file:\n")
+print(names(abin_share_raw)[1:30])
+
+cat("\nSaved final files.\n")
 

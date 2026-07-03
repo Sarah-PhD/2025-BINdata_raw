@@ -288,15 +288,15 @@ clean_2012_2019 <- function(df) {
     
     "Downy_undamaged" = "downy_undamaged",
     "Downy_damaged" = "downy_damage",
-    "Downy_Top" = "downy_winter_top_shoot",
-    "Downy_Stem" = "downy_winter_stem",
-    "Downy_Bark" = "downy_winter_bark",
+    "Downy_Top" = "downy_fts",
+    "Downy_Stem" = "downy_fs",
+    "Downy_Bark" = "downy_fb",
     
     "Silver_undamaged" = "silver_undamaged",
     "Silver_damaged" = "silver_damage",
-    "Silver_Top" = "silver_winter_top_shoot",
-    "Silver_Stem" = "silver_winter_stem",
-    "Silber_Bark" = "silver_winter_bark",
+    "Silver_Top" = "silver_fts",
+    "Silver_Stem" = "silver_fs",
+    "Silber_Bark" = "silver_fb",
     
     "Spruce_undamaged" = "spruce_ub",
     "Spruce_damaged" = "spruce_damaged",
@@ -328,45 +328,47 @@ clean_2021 <- function(df) {
   map <- c(
     "T_oskad" = "pine_unbrowsed",
     "T_topp_färsk" = "pine_fts",
-    "T_topp_fjol" = "pine_fts,od",
+    "T_topp_fjol" = "pine_fts,ps",
     "T_topp_gam" = "pine_od",
     "Tallar___17" = "pine_stems",
     "Tallar...17" = "pine_stems",
     "T_brott_färsk" = "pine_fs",
-    "T_brott_fjol" = "pine_fs,od",
+    "T_brott_fjol" = "pine_fs,ps",
     "T_brott_gam" = "pine_fs,od",
     "T_bark_färsk" = "pine_fb",
-    "T_bark_fjol" = "pine_fb,od",
+    "T_bark_fjol" = "pine_fb,ps",
     "T_bark_gam" = "pine_fb,od",
-    "Färsk_tallskada_antal" = "pine_winter_damage_stems",
-    "Färsk_tallskada_%" = "proportion_pine_damage_winter",
+    "Färsk_tallskada_antal" = "pine_fresh_damage_stems",
+    "Färsk_tallskada_%" = "proportion_pine_damage_fresh",
     "Årsskada_tall" = "pine_yearly_damage_stems",
     
+    # Downy birch / Glasbjörk
     "GB_oskad" = "downy_undamaged",
-    "GB_topp_färsk" = "downy_winter_top_shoot",
-    "GB_topp_gam" = "downy_wts_+_old",
+    "GB_topp_färsk" = "downy_fts",
+    "GB_topp_gam" = "downy_od",
     "Glasbjörk___30" = "downy_total",
     "Glasbjörk...30" = "downy_total",
-    "GB_brott_färsk" = "downy_winter_stem",
-    "GB_brott_gam" = "downy_ws_+_old",
-    "GB_bark_färsk" = "downy_winter_bark",
-    "GB_bark_gam" = "downy_wb_+_old",
+    "GB_brott_färsk" = "downy_fs",
+    "GB_brott_gam" = "downy_fs,od",
+    "GB_bark_färsk" = "downy_fb",
+    "GB_bark_gam" = "downy_fb,od",
     
+    # Silver birch / Vårtbjörk
     "VB_oskad" = "silver_undamaged",
-    "VB_topp_färsk" = "silver_winter_top_shoot",
-    "VB_topp_fjol" = "silver_wts_+_old",
-    "VB_topp_gam" = "silver_old",
+    "VB_topp_färsk" = "silver_fts",
+    "VB_topp_fjol" = "silver_fts,ps",
+    "VB_topp_gam" = "silver_od",
     "Vårtbjörk___39" = "silver_total",
     "Vårtbjörk...39" = "silver_total",
-    "VB_brott_färsk" = "silver_winter_stem",
-    "VB_brott_fjol" = "silver_ws_+_old",
-    "VB_brott_gam" = "silver_ws_+_old",
-    "VB_bark_färsk" = "silver_winter_bark",
-    "VB_bark_gam" = "silver_wb_+_old",
+    "VB_brott_färsk" = "silver_fs",
+    "VB_brott_fjol" = "silver_fs,ps",
+    "VB_brott_gam" = "silver_fs,od",
+    "VB_bark_färsk" = "silver_fb",
+    "VB_bark_gam" = "silver_fb,od",
     
     "G_oskad" = "spruce_ub",
     "G_topp_färsk" = "spruce_fts",
-    "G_topp_fjol" = "spruce_fts,od",
+    "G_topp_fjol" = "spruce_fts,ps",
     "G_topp_gam" = "spruce_od",
     "Gran___49" = "spruce_stems",
     "Gran...49" = "spruce_stems",
@@ -402,14 +404,6 @@ clean_2021 <- function(df) {
     "Antal_skadade_barrstammar" = "conifer_damaged_stems",
     "Andel_skadade_barrstammar" = "proportion_conifer_damaged",
     
-    "Tallar___77" = "pine_stems_density_or_summary",
-    "Tallar...77" = "pine_stems_density_or_summary",
-    "Gran___78" = "spruce_stems_density_or_summary",
-    "Gran...78" = "spruce_stems_density_or_summary",
-    "Glasbjörk___79" = "downy_stems_density_or_summary",
-    "Glasbjörk...79" = "downy_stems_density_or_summary",
-    "Vårtbjörk___80" = "silver_stems_density_or_summary",
-    "Vårtbjörk...80" = "silver_stems_density_or_summary",
     "Totalt" = "total_stems_density_or_summary",
     "Andel_tall" = "proportion_pine",
     "Andel_gran" = "proportion_spruce",
@@ -420,11 +414,28 @@ clean_2021 <- function(df) {
     "Stamtäthet" = "stem_density",
     "Tall_+_Björk" = "pine_plus_birch"
   )
-  
   df <- rename_many_if_present(df, map)
+  
+  # Make duplicate column names temporarily unique so select() can work
+  names(df) <- make.unique(names(df), sep = "...dup")
+  
+  # Remove duplicated species-count columns
+  df <- df %>%
+    select(
+      -any_of(c(
+        "Tallar...77",
+        "Gran...78",
+        "Glasbjörk...79",
+        "Vårtbjörk...80",
+        "Tallar_77",
+        "Gran_78",
+        "Glasbjörk_79",
+        "Vårtbjörk_80"
+      ))
+    )
+  
   df
 }
-
 #=============================================================================
 # UPDATED 2022 CLEANING FUNCTION
 #=============================================================================
