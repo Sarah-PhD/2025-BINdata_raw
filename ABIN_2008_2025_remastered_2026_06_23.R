@@ -144,7 +144,6 @@ rename_if_present <- function(df, old, new) {
 }
 
 rename_many_if_present <- function(df, map) {
-  # map must be c("old_name" = "new_name")
   for (old in names(map)) {
     df <- rename_if_present(df, old, map[[old]])
   }
@@ -156,7 +155,6 @@ standardise_basic_names <- function(df) {
   names(df) <- clean_colnames_basic(names(df))
   
   basic_map <- c(
-    # Core site variables
     "Area" = "area",
     "Område" = "area",
     "area" = "area",
@@ -189,8 +187,9 @@ standardise_basic_names <- function(df) {
     "pct" = "pct",
     
     "Height" = "half_height",
-    "Medelhöjd" = "half_height",
+    "Höjd_m" = "half_height",
     "half_height" = "half_height",
+    "Medelhöjd" = "average_height_m",
     
     "N" = "north",
     "Nord" = "north",
@@ -201,7 +200,6 @@ standardise_basic_names <- function(df) {
     "east" = "east",
     
     "Nearest_Trakt" = "nearest_tract",
-    "nearest_tract" = "nearest_tract",
     "nearest_tract" = "nearest_tract",
     
     "Productivity" = "productivity",
@@ -225,7 +223,7 @@ clean_2008_2011 <- function(df) {
   df <- standardise_basic_names(df)
   
   map <- c(
-    "Pine_undamaged" = "pine_unbrowsed",
+    "Pine_undamaged" = "pine_ub",
     "Pine_damaged" = "pine_damaged",
     "Pine_Top_shoot" = "pine_fts",
     "Pine_Top_shoot_Old" = "pine_fts,od",
@@ -237,7 +235,7 @@ clean_2008_2011 <- function(df) {
     "Pine_Old" = "pine_od",
     "Other" = "pine_o",
     "PD_H" = "pine_stems_<_hh",
-    "PU_H" = "pine_unbrowsed_<_hh",
+    "PU_H" = "pine_ub_<_hh",
     "Over_HH" = "pine_stems_>_hh",
     "Under_HH" = "pine_stems_<_hh",
     
@@ -271,8 +269,7 @@ clean_2008_2011 <- function(df) {
     "WildBore_Pellets" = "wild_boar"
   )
   
-  df <- rename_many_if_present(df, map)
-  df
+  rename_many_if_present(df, map)
 }
 
 clean_2012_2019 <- function(df) {
@@ -280,20 +277,20 @@ clean_2012_2019 <- function(df) {
   df <- standardise_basic_names(df)
   
   map <- c(
-    "Pine_undamaged" = "pine_unbrowsed",
+    "Pine_undamaged" = "pine_ub",
     "Pine_damaged" = "pine_damaged",
     "Pine_Top" = "pine_fts",
     "Pine_Stem" = "pine_fs",
     "Pine_Bark" = "pine_fb",
     
-    "Downy_undamaged" = "downy_undamaged",
-    "Downy_damaged" = "downy_damage",
+    "Downy_undamaged" = "downy_ub",
+    "Downy_damaged" = "downy_damaged",
     "Downy_Top" = "downy_fts",
     "Downy_Stem" = "downy_fs",
     "Downy_Bark" = "downy_fb",
     
-    "Silver_undamaged" = "silver_undamaged",
-    "Silver_damaged" = "silver_damage",
+    "Silver_undamaged" = "silver_ub",
+    "Silver_damaged" = "silver_damaged",
     "Silver_Top" = "silver_fts",
     "Silver_Stem" = "silver_fs",
     "Silber_Bark" = "silver_fb",
@@ -305,33 +302,30 @@ clean_2012_2019 <- function(df) {
     "Spruce_Bark" = "spruce_fb",
     
     "Rowan_Height" = "rowan_height",
-    "Rowan_damaged" = "rowan_damage",
+    "Rowan_damaged" = "rowan_damaged",
     "Aspen_Height" = "aspen_height",
-    "Aspen_damaged" = "aspen_damage",
+    "Aspen_damaged" = "aspen_damaged",
     "Salix_Height" = "salix_height",
-    "Salix_damaged" = "salix_damage",
+    "Salix_damaged" = "salix_damaged",
     "Oak_Height" = "oak_height",
-    "Oak_damaged" = "oak_damage"
+    "Oak_damaged" = "oak_damaged"
   )
   
-  df <- rename_many_if_present(df, map)
-  df
+  rename_many_if_present(df, map)
 }
-#=============================================================================
-# UPDATED 2021 CLEANING FUNCTION
-#=============================================================================
 
 clean_2021 <- function(df) {
   
   df <- standardise_basic_names(df)
   
   map <- c(
-    "T_oskad" = "pine_unbrowsed",
+    "T_oskad" = "pine_ub",
     "T_topp_färsk" = "pine_fts",
     "T_topp_fjol" = "pine_fts,ps",
     "T_topp_gam" = "pine_od",
     "Tallar___17" = "pine_stems",
     "Tallar...17" = "pine_stems",
+    "Tallar_17" = "pine_stems",
     "T_brott_färsk" = "pine_fs",
     "T_brott_fjol" = "pine_fs,ps",
     "T_brott_gam" = "pine_fs,od",
@@ -342,24 +336,24 @@ clean_2021 <- function(df) {
     "Färsk_tallskada_%" = "proportion_pine_damage_fresh",
     "Årsskada_tall" = "pine_yearly_damage_stems",
     
-    # Downy birch / Glasbjörk
-    "GB_oskad" = "downy_undamaged",
+    "GB_oskad" = "downy_ub",
     "GB_topp_färsk" = "downy_fts",
     "GB_topp_gam" = "downy_od",
     "Glasbjörk___30" = "downy_total",
     "Glasbjörk...30" = "downy_total",
+    "Glasbjörk_30" = "downy_total",
     "GB_brott_färsk" = "downy_fs",
     "GB_brott_gam" = "downy_fs,od",
     "GB_bark_färsk" = "downy_fb",
     "GB_bark_gam" = "downy_fb,od",
     
-    # Silver birch / Vårtbjörk
-    "VB_oskad" = "silver_undamaged",
+    "VB_oskad" = "silver_ub",
     "VB_topp_färsk" = "silver_fts",
     "VB_topp_fjol" = "silver_fts,ps",
     "VB_topp_gam" = "silver_od",
     "Vårtbjörk___39" = "silver_total",
     "Vårtbjörk...39" = "silver_total",
+    "Vårtbjörk_39" = "silver_total",
     "VB_brott_färsk" = "silver_fs",
     "VB_brott_fjol" = "silver_fs,ps",
     "VB_brott_gam" = "silver_fs,od",
@@ -372,6 +366,7 @@ clean_2021 <- function(df) {
     "G_topp_gam" = "spruce_od",
     "Gran___49" = "spruce_stems",
     "Gran...49" = "spruce_stems",
+    "Gran_49" = "spruce_stems",
     "G_brott_färsk" = "spruce_fs",
     "G_brott_gam" = "spruce_fs,od",
     "G_bark_färsk" = "spruce_fb",
@@ -398,7 +393,7 @@ clean_2021 <- function(df) {
     "ek_obet" = "oak_undamaged",
     
     "T_låg_bet" = "pine_browsed_<_hh",
-    "T_låg_obet" = "pine_unbrowsed_<_hh",
+    "T_låg_obet" = "pine_ub_<_hh",
     
     "Antal_barrstammar" = "conifer_stems",
     "Antal_skadade_barrstammar" = "conifer_damaged_stems",
@@ -414,31 +409,23 @@ clean_2021 <- function(df) {
     "Stamtäthet" = "stem_density",
     "Tall_+_Björk" = "pine_plus_birch"
   )
-  df <- rename_many_if_present(df, map)
   
-  # Make duplicate column names temporarily unique so select() can work
+  df <- rename_many_if_present(df, map)
   names(df) <- make.unique(names(df), sep = "...dup")
   
-  # Remove duplicated species-count columns
   df <- df %>%
     select(
       -any_of(c(
-        "Tallar...77",
-        "Gran...78",
-        "Glasbjörk...79",
-        "Vårtbjörk...80",
-        "Tallar_77",
-        "Gran_78",
-        "Glasbjörk_79",
-        "Vårtbjörk_80"
+        "Tallar...77", "Tallar_77",
+        "Gran...78", "Gran_78",
+        "Glasbjörk...79", "Glasbjörk_79",
+        "Vårtbjörk...80", "Vårtbjörk_80",
+        "76"
       ))
     )
   
   df
 }
-#=============================================================================
-# UPDATED 2022 CLEANING FUNCTION
-#=============================================================================
 
 clean_2022 <- function(df) {
   
@@ -446,7 +433,6 @@ clean_2022 <- function(df) {
   
   map <- c(
     "#" = "plot",
-    "nearest_tract" = "nearest_tract",
     "nearest_tract" = "nearest_tract",
     "half_height" = "half_height",
     "PCT" = "pct",
@@ -458,16 +444,24 @@ clean_2022 <- function(df) {
     "<50%" = "pine_<_50",
     ">50%_gran" = "spruce_>_50",
     
-    "Glasbjörk_antal" = "downy_total",
-    "Vårtbjörk_antal" = "silver_total",
-    "Rönn_höjd" = "rowan_height",
-    "Rönn_antal" = "rowan_total",
-    "Asp_höjd" = "aspen_height",
-    "Asp_antal" = "aspen_total",
-    "Salix_höjd" = "salix_height",
-    "Salix_antal" = "salix_total",
-    "Ek_höjd" = "oak_height",
-    "Ek_antal" = "oak_total",
+    "O" = "pine_ub",
+    "T" = "pine_fts",
+    "T+G" = "pine_fts,od",
+    "S" = "pine_fs",
+    "B" = "pine_fb",
+    "G" = "pine_od",
+    "A" = "pine_o",
+    
+    "Glasbjörk_(antal)" = "downy_total",
+    "Vårtbjörk_(antal)" = "silver_total",
+    "Rönn_(höjd)" = "rowan_height",
+    "Rönn_(antal)" = "rowan_total",
+    "Asp_(höjd)" = "aspen_height",
+    "Asp_(antal)" = "aspen_total",
+    "Salix_(höjd)" = "salix_height",
+    "Salix_(antal)" = "salix_total",
+    "Ek_(höjd)" = "oak_height",
+    "Ek_(antal)" = "oak_total",
     
     "Ä" = "moose_pellets_raw",
     "K" = "red_deer_pellets_raw",
@@ -475,16 +469,13 @@ clean_2022 <- function(df) {
     "V" = "wild_boar"
   )
   
-  df <- rename_many_if_present(df, map)
-  df
+  rename_many_if_present(df, map)
 }
-
 
 clean_2023_2025 <- function(df) {
   
   df <- standardise_basic_names(df)
   
-  # Fix the special spruce names you asked about
   spruce_map <- c(
     "o,spruce_fts" = "spruce_fts,o",
     "o,spruce_od"  = "spruce_od,o",
@@ -493,8 +484,7 @@ clean_2023_2025 <- function(df) {
     "od,spruce_o"  = "spruce_o,od"
   )
   
-  df <- rename_many_if_present(df, spruce_map)
-  df
+  rename_many_if_present(df, spruce_map)
 }
 
 #=============================================================================
@@ -507,20 +497,17 @@ abin_2021_clean      <- clean_2021(abin_2021)
 abin_2022_clean      <- clean_2022(abin_2022)
 abin_2023_2025_clean <- clean_2023_2025(abin_2023_2025)
 
+abin_2021_clean$year <- 2021
+abin_2022_clean$year <- 2022
+
 #=============================================================================
-# 4) CHECK THAT NO COLUMNS WERE LOST DURING RENAMING
+# 4) CHECKS BEFORE BINDING
 #=============================================================================
 
 check_lost_columns <- function(original, cleaned, label) {
   cat("\n---", label, "---\n")
   cat("Original columns:", ncol(original), "\n")
   cat("Cleaned columns:", ncol(cleaned), "\n")
-  
-  if (ncol(original) == ncol(cleaned)) {
-    cat("No columns lost.\n")
-  } else {
-    cat("Column number changed. Check carefully.\n")
-  }
 }
 
 check_lost_columns(abin_2008_2011, abin_2008_2011_clean, "2008–2011")
@@ -530,30 +517,14 @@ check_lost_columns(abin_2022, abin_2022_clean, "2022")
 check_lost_columns(abin_2023_2025, abin_2023_2025_clean, "2023–2025")
 
 #=============================================================================
-# ADD YEAR WHERE SHEETS DO NOT HAVE A YEAR COLUMN
-#=============================================================================
-
-abin_2008_2011_clean$year <- ifelse(
-  is.na(abin_2008_2011_clean$year),
-  NA,
-  abin_2008_2011_clean$year
-)
-
-abin_2021_clean$year <- 2021
-abin_2022_clean$year <- 2022
-
-#=============================================================================
-# MAKE ALL CLEANED DATAFRAMES SAFE TO BIND
-# Handles duplicate names first, then converts all columns to character
+# 5) MAKE SAFE TO BIND
+# Convert all columns to character so bind_rows() is not blocked by type conflicts
 #=============================================================================
 
 make_bind_safe <- function(df) {
   df <- as.data.frame(df, check.names = FALSE)
-  
   names(df) <- make.unique(names(df), sep = "...dup")
-  
   df[] <- lapply(df, as.character)
-  
   df
 }
 
@@ -564,7 +535,7 @@ abin_2022_clean      <- make_bind_safe(abin_2022_clean)
 abin_2023_2025_clean <- make_bind_safe(abin_2023_2025_clean)
 
 #=============================================================================
-# 5) COMBINE ALL YEARS
+# 6) COMBINE ALL YEARS
 #=============================================================================
 
 abin_combined <- bind_rows(
@@ -575,9 +546,59 @@ abin_combined <- bind_rows(
   abin_2023_2025_clean
 )
 
+#=============================================================================
+# 6B) MERGE DUPLICATE COLUMNS CREATED BY make.unique()
+# Example: pine_fb + pine_fb...dup1 become one pine_fb column
+#=============================================================================
+
+dup_cols <- grep("\\.\\.\\.dup[0-9]*$", names(abin_combined), value = TRUE)
+
+for (dup in dup_cols) {
+  
+  base <- sub("\\.\\.\\.dup[0-9]*$", "", dup)
+  
+  if (base %in% names(abin_combined)) {
+    
+    abin_combined[[base]] <- dplyr::coalesce(
+      as.character(abin_combined[[base]]),
+      as.character(abin_combined[[dup]])
+    )
+    
+    abin_combined[[dup]] <- NULL
+  }
+}
+
+cat("\nRemaining duplicate columns:\n")
+print(grep("\\.\\.\\.dup", names(abin_combined), value = TRUE))
+#=============================================================================
+# 7) REMOVE UNUSED / LEGACY COLUMNS
+#=============================================================================
+
+abin_combined <- abin_combined %>%
+  select(
+    -any_of(c(
+      "height_m",
+      "Medelhöjd",
+      "Medelhojd",
+      "pine_unbrowsed",
+      "pine_unbrowsed_<_hh",
+      "downy_winter_top_shoot",
+      "downy_winter_stem",
+      "downy_winter_bark",
+      "downy_wts_+_old",
+      "downy_ws_+_old",
+      "downy_wb_+_old",
+      "silver_winter_top_shoot",
+      "silver_winter_stem",
+      "silver_winter_bark",
+      "silver_wts_+_old",
+      "silver_ws_+_old",
+      "silver_wb_+_old"
+    ))
+  )
 
 #=============================================================================
-# CONVERT IMPORTANT NUMERIC COLUMNS BACK TO NUMERIC
+# 8) CONVERT NUMERIC COLUMNS
 #=============================================================================
 
 to_num <- function(x) {
@@ -589,7 +610,7 @@ to_num <- function(x) {
 
 numeric_cols <- names(abin_combined)[
   grepl(
-    "year|age|height|north|east|stems|unbrowsed|damaged|damage|pellets|density|proportion|pct|plot|productivity|wild_boar|reindeer",
+    "year|age|height|north|east|stems|ub|damaged|damage|pellets|density|proportion|pct|plot|productivity|wild_boar|reindeer|total",
     names(abin_combined),
     ignore.case = TRUE
   )
@@ -599,37 +620,7 @@ abin_combined <- abin_combined %>%
   mutate(across(any_of(numeric_cols), to_num))
 
 #=============================================================================
-# MERGE DUPLICATE COLUMNS AFTER BINDING
-#=============================================================================
-
-coalesce_duplicate_columns <- function(df) {
-  
-  dup_names <- unique(names(df)[duplicated(names(df))])
-  
-  if (length(dup_names) == 0) {
-    message("No duplicate column names found.")
-    return(df)
-  }
-  
-  message("Merging duplicate columns:")
-  print(dup_names)
-  
-  for (nm in dup_names) {
-    idx <- which(names(df) == nm)
-    
-    merged <- dplyr::coalesce(!!!df[idx])
-    
-    df <- df[, -idx, drop = FALSE]
-    df[[nm]] <- merged
-  }
-  
-  df
-}
-
-abin_combined <- coalesce_duplicate_columns(abin_combined)
-
-#=============================================================================
-# 6) FINAL COLUMN ORDER
+# 9) FINAL COLUMN ORDER
 #=============================================================================
 
 core_cols <- c(
@@ -640,11 +631,9 @@ core_cols <- c(
 
 pine_core <- c(
   "pine_stems",
-  "pine_unbrowsed",
-  "pine_winter_damage_stems",
-  "proportion_pine_damage_winter",
-  "pine_summer_damage_stems",
-  "proportion_pine_damage_summer",
+  "pine_ub",
+  "pine_fresh_damage_stems",
+  "proportion_pine_damage_fresh",
   "pine_yearly_damage_stems",
   "proportion_pine_damage_yearly",
   "pine_rebrowsed_stems",
@@ -659,18 +648,9 @@ pine_combo <- names(abin_combined)[
 spruce_cols <- names(abin_combined)[grepl("^spruce_", names(abin_combined))]
 contorta_cols <- names(abin_combined)[grepl("^contorta_", names(abin_combined))]
 larch_cols <- names(abin_combined)[grepl("^larch_", names(abin_combined))]
-
-birch_cols <- names(abin_combined)[
-  grepl("^downy_|^silver_", names(abin_combined))
-]
-
-broadleaf_cols <- names(abin_combined)[
-  grepl("^rowan_|^aspen_|^salix_|^oak_", names(abin_combined))
-]
-
-pellet_cols <- names(abin_combined)[
-  grepl("pellets|moose_density|reindeer|wild_boar", names(abin_combined))
-]
+birch_cols <- names(abin_combined)[grepl("^downy_|^silver_", names(abin_combined))]
+broadleaf_cols <- names(abin_combined)[grepl("^rowan_|^aspen_|^salix_|^oak_", names(abin_combined))]
+pellet_cols <- names(abin_combined)[grepl("pellets|moose_density|reindeer|wild_boar", names(abin_combined))]
 
 end_cols <- c("comments")
 
@@ -694,11 +674,14 @@ abin_combined <- abin_combined %>%
   select(all_of(ordered_cols), all_of(remaining_cols))
 
 #=============================================================================
-# 7) FINAL CHECKS
+# 10) FINAL CHECKS
 #=============================================================================
 
 cat("\nRows by year:\n")
 print(table(abin_combined$year, useNA = "ifany"))
+
+cat("\nUnwanted names still present:\n")
+print(grep("winter|pine_unbrowsed|Medelhöjd", names(abin_combined), value = TRUE))
 
 cat("\nOld bad spruce names still present:\n")
 print(intersect(
@@ -712,38 +695,16 @@ print(intersect(
   c("spruce_fts,o", "spruce_od,o", "spruce_ub,o", "spruce_fs,od", "spruce_o,od")
 ))
 
-cat("\nFirst 30 columns:\n")
-print(names(abin_combined)[1:30])
+cat("\nFinal dimensions:\n")
+print(dim(abin_combined))
+
+cat("\nFirst 40 columns:\n")
+print(names(abin_combined)[1:40])
 
 #=============================================================================
-# 8) SAVE
+# 11) SAVE
 #=============================================================================
 
 write_csv(abin_combined, "abin_2008_2025_combined.csv")
 write_xlsx(abin_combined, "abin_2008_2025_combined.xlsx")
-
-
-# Check rows by year
-table(abin_combined$year, useNA = "ifany")
-
-# Check final dimensions
-dim(abin_combined)
-
-# Check duplicate columns
-names(abin_combined)[duplicated(names(abin_combined))]
-
-# Check old bad spruce names
-intersect(
-  names(abin_combined),
-  c("o,spruce_fts", "o,spruce_od", "o,spruce_ub", "od,spruce_fs", "od,spruce_o")
-)
-
-# Check corrected spruce names
-intersect(
-  names(abin_combined),
-  c("spruce_fts,o", "spruce_od,o", "spruce_ub,o", "spruce_fs,od", "spruce_o,od")
-)
-
-# View first columns
-names(abin_combined)[1:40]
 
