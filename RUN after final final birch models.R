@@ -14,6 +14,574 @@ BIC(m_plot_height, m_plot_nested)
 summary(m_plot_nested)
 
 VarCorr(m_plot_nested)
+
+#Interpretation for notes
+
+#Beta regression was tested as a sensitivity analysis, but both standard beta 
+#and zero-inflated beta GLMMs failed to converge due to unstable likelihoods. 
+#This was likely because the response contains many exact zeros and is derived 
+#from averaged ordinal severity class midpoints rather than true continuous 
+#proportions. The Gaussian LMM with both area and stand random effects fitted 
+#successfully, had better AIC than the area-only model, and gave stable 
+#estimates for the main interaction.
+
+
+##############################################################################
+# Basic stats
+###############################################################################
+#1. Is one birch species more damaged than the other?
+m_damage_species <- lm(damage_N ~ species,
+                       data = birch_stand_long_damage)
+
+summary(m_damage_species)
+anova(m_damage_species)
+
+#2. Does one species have more stems?
+m_stems_species <- lm(stem_count ~ species,
+                      data = birch_stand_long_damage)
+
+summary(m_stems_species)
+anova(m_stems_species)
+
+#3. Do the species differ across latitude in damage?
+m_damage_latitude <- lm(
+  damage_N ~ species * mean_north_c,
+  data = birch_stand_long_damage
+)
+
+summary(m_damage_latitude)
+anova(m_damage_latitude)
+
+#4. Do the species differ across latitude in abundance?
+
+m_stems_latitude <- lm(
+  stem_count ~ species * mean_north_c,
+  data = birch_stand_long_damage
+)
+
+summary(m_stems_latitude)
+anova(m_stems_latitude)
+
+#Basics
+library(dplyr)
+
+birch_stand_long_damage %>%
+  group_by(species) %>%
+  summarise(
+    n = n(),
+    Mean_damage_c = mean(damage_N, na.rm = TRUE),
+    SD_damage = sd(damage_N, na.rm = TRUE),
+    Mean_stems = mean(stem_count, na.rm = TRUE),
+    SD_stems = sd(stem_count, na.rm = TRUE)
+  )
+
+
+###############################################################################
+# PLOT-LEVEL MODELS
+###############################################################################
+
+library(lme4)
+
+###############################################################################
+# Model P1 — Additive plot model
+###############################################################################
+
+m_plot_additive <- lmer(
+  damage_N ~
+    species +
+    prop_s_plot +
+    north_c +
+    stem_count_c +
+    height_c +
+    moose_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_full_ecology_plot,
+  REML = TRUE
+)
+
+###############################################################################
+# Model P2 — Species interaction plot model
+###############################################################################
+
+m_plot_species <- lmer(
+  damage_N ~
+    species * prop_s_plot +
+    species * north_c +
+    species * stem_count_c +
+    species * height_c +
+    species * moose_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_full_ecology_plot,
+  REML = TRUE
+)
+
+###############################################################################
+# Model P3 — Regional interaction plot model
+###############################################################################
+
+m_plot_region <- lmer(
+  damage_N ~
+    species * prop_s_plot * region +
+    species * height_c +
+    species * stem_count_c +
+    species * moose_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_full_ecology_plot,
+  REML = TRUE
+)
+
+###############################################################################
+# MODEL COMPARISON
+###############################################################################
+
+model_comparison_table <- bind_rows(
+  model_summary_row(m_plot_additive, "Plot additive model"),
+  model_summary_row(m_plot_species, "Plot species interaction"),
+  model_summary_row(m_plot_region, "Plot regional interaction"),
+  
+  model_summary_row(m_stand_additive, "Stand additive model"),
+  model_summary_row(m_stand_species, "Stand species interaction"),
+  model_summary_row(m_stand_region_int, "Stand regional interaction"),
+  
+  model_summary_row(m_downy_nested, "Downy-only model"),
+  model_summary_row(m_silver_nested, "Silver-only model"),
+  
+  model_summary_row(m_north_nested, "North-only model"),
+  model_summary_row(m_centre_nested, "Centre-only model"),
+  model_summary_row(m_south_nested, "South-only model")
+)
+
+###############################################################################
+# TABLE S7 — Plot additive model
+###############################################################################
+
+sjPlot::tab_model(
+  m_plot_additive,
+  show.se = TRUE,
+  show.ci = FALSE,
+  show.stat = TRUE,
+  show.p = TRUE,
+  show.re.var = TRUE,
+  show.icc = TRUE,
+  show.r2 = TRUE,
+  show.ngroups = TRUE,
+  dv.labels = "Plot additive",
+  file = file.path(tab_dir, "Table_S7_plot_additive.html")
+)
+
+###############################################################################
+# TABLE S8 — Plot species interaction model
+###############################################################################
+
+sjPlot::tab_model(
+  m_plot_species,
+  show.se = TRUE,
+  show.ci = FALSE,
+  show.stat = TRUE,
+  show.p = TRUE,
+  show.re.var = TRUE,
+  show.icc = TRUE,
+  show.r2 = TRUE,
+  show.ngroups = TRUE,
+  dv.labels = "Plot species interaction",
+  file = file.path(tab_dir, "Table_S8_plot_species_interaction.html")
+)
+
+###############################################################################
+# TABLE S9 — Plot regional interaction model
+###############################################################################
+
+sjPlot::tab_model(
+  m_plot_region,
+  show.se = TRUE,
+  show.ci = FALSE,
+  show.stat = TRUE,
+  show.p = TRUE,
+  show.re.var = TRUE,
+  show.icc = TRUE,
+  show.r2 = TRUE,
+  show.ngroups = TRUE,
+  dv.labels = "Plot regional interaction",
+  file = file.path(tab_dir, "Table_S9_plot_regional_interaction.html")
+)
+###############################################################################
+# TABLE S7 — Plot-level models
+###############################################################################
+
+sjPlot::tab_model(
+  m_plot_additive,
+  m_plot_species,
+  m_plot_region,
+  show.se = TRUE,
+  show.ci = FALSE,
+  show.stat = TRUE,
+  show.p = TRUE,
+  show.re.var = TRUE,
+  show.icc = TRUE,
+  show.r2 = TRUE,
+  show.ngroups = TRUE,
+  dv.labels = c(
+    "Plot additive",
+    "Plot species interaction",
+    "Plot regional interaction"
+  ),
+  file = file.path(tab_dir, "Table_S7_plot_level_models.html")
+)
+
+
+###############################################################################
+# SPECIES-SPECIFIC PLOT MODELS
+# Same covariates as the interaction model, but run separately by species
+###############################################################################
+
+df_downy <- df_full_ecology_plot %>%
+  filter(species == "Downy") %>%
+  droplevels()
+
+df_silver <- df_full_ecology_plot %>%
+  filter(species == "Silver") %>%
+  droplevels()
+
+m_plot_downy <- lmer(
+  damage_N ~
+    prop_s_plot +
+    north_c +
+    stem_count_c +
+    height_c +
+    moose_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_downy,
+  REML = TRUE
+)
+
+m_plot_silver <- lmer(
+  damage_N ~
+    prop_s_plot +
+    north_c +
+    stem_count_c +
+    height_c +
+    moose_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_silver,
+  REML = TRUE
+)
+
+
+###############################################################################
+# REGION-SPECIFIC PLOT MODELS
+# Same structure as the plot species-interaction model, but run separately by region
+###############################################################################
+
+df_north <- df_full_ecology_plot %>%
+  filter(region == "North") %>%
+  droplevels()
+
+df_centre <- df_full_ecology_plot %>%
+  filter(region == "Centre") %>%
+  droplevels()
+
+df_south <- df_full_ecology_plot %>%
+  filter(region == "South") %>%
+  droplevels()
+
+m_plot_north <- lmer(
+  damage_N ~
+    species * prop_s_plot +
+    species * height_c +
+    species * stem_count_c +
+    species * moose_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_north,
+  REML = TRUE
+)
+
+m_plot_centre <- lmer(
+  damage_N ~
+    species * prop_s_plot +
+    species * height_c +
+    species * stem_count_c +
+    species * moose_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_centre,
+  REML = TRUE
+)
+
+m_plot_south <- lmer(
+  damage_N ~
+    species * prop_s_plot +
+    species * height_c +
+    species * stem_count_c +
+    species * moose_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_south,
+  REML = TRUE
+)
+###############################################################################
+# TABLE S8 — Plot species-specific models
+###############################################################################
+
+sjPlot::tab_model(
+  m_plot_downy,
+  m_plot_silver,
+  show.se = TRUE,
+  show.ci = FALSE,
+  show.stat = TRUE,
+  show.p = TRUE,
+  show.re.var = TRUE,
+  show.icc = TRUE,
+  show.r2 = TRUE,
+  show.ngroups = TRUE,
+  show.loglik = FALSE,
+  dv.labels = c(
+    "Downy birch",
+    "Silver birch"
+  ),
+  file = file.path(tab_dir, "Table_S8_plot_species_models.html")
+)
+
+###############################################################################
+# TABLE S9 — Plot regional models
+###############################################################################
+
+sjPlot::tab_model(
+  m_plot_north,
+  m_plot_centre,
+  m_plot_south,
+  show.se = TRUE,
+  show.ci = FALSE,
+  show.stat = TRUE,
+  show.p = TRUE,
+  show.re.var = TRUE,
+  show.icc = TRUE,
+  show.r2 = TRUE,
+  show.ngroups = TRUE,
+  dv.labels = c(
+    "North",
+    "Centre",
+    "South"
+  ),
+  file = file.path(tab_dir, "Table_S9_plot_regional_models.html")
+)
+
+###############################################################################
+# PLOT-LEVEL MODELS — ALL CERVID PELLETS
+###############################################################################
+
+m_plot_additive_cervid <- lmer(
+  damage_N ~
+    species +
+    prop_s_plot +
+    north_c +
+    stem_count_c +
+    height_c +
+    total_cervid_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_full_ecology_plot,
+  REML = TRUE
+)
+
+m_plot_species_cervid <- lmer(
+  damage_N ~
+    species * prop_s_plot +
+    species * north_c +
+    species * stem_count_c +
+    species * height_c +
+    species * total_cervid_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_full_ecology_plot,
+  REML = TRUE
+)
+
+m_plot_region_cervid <- lmer(
+  damage_N ~
+    species * prop_s_plot * region +
+    species * height_c +
+    species * stem_count_c +
+    species * total_cervid_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_full_ecology_plot,
+  REML = TRUE
+)
+
+###############################################################################
+# SPECIES-SPECIFIC PLOT MODELS — ALL CERVID PELLETS
+###############################################################################
+
+df_downy_cervid <- df_full_ecology_plot %>%
+  filter(species == "Downy") %>%
+  droplevels()
+
+df_silver_cervid <- df_full_ecology_plot %>%
+  filter(species == "Silver") %>%
+  droplevels()
+
+m_plot_downy_cervid <- lmer(
+  damage_N ~
+    prop_s_plot +
+    north_c +
+    stem_count_c +
+    height_c +
+    total_cervid_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_downy_cervid,
+  REML = TRUE
+)
+
+m_plot_silver_cervid <- lmer(
+  damage_N ~
+    prop_s_plot +
+    north_c +
+    stem_count_c +
+    height_c +
+    total_cervid_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_silver_cervid,
+  REML = TRUE
+)
+
+###############################################################################
+# REGION-SPECIFIC PLOT MODELS — ALL CERVID PELLETS
+###############################################################################
+
+df_north_cervid <- df_full_ecology_plot %>%
+  filter(region == "North") %>%
+  droplevels()
+
+df_centre_cervid <- df_full_ecology_plot %>%
+  filter(region == "Centre") %>%
+  droplevels()
+
+df_south_cervid <- df_full_ecology_plot %>%
+  filter(region == "South") %>%
+  droplevels()
+
+m_plot_north_cervid <- lmer(
+  damage_N ~
+    species * prop_s_plot +
+    species * height_c +
+    species * stem_count_c +
+    species * total_cervid_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_north_cervid,
+  REML = TRUE
+)
+
+m_plot_centre_cervid <- lmer(
+  damage_N ~
+    species * prop_s_plot +
+    species * height_c +
+    species * stem_count_c +
+    species * total_cervid_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_centre_cervid,
+  REML = TRUE
+)
+
+m_plot_south_cervid <- lmer(
+  damage_N ~
+    species * prop_s_plot +
+    species * height_c +
+    species * stem_count_c +
+    species * total_cervid_pellets_log +
+    pct +
+    year +
+    (1 | area/stand_id/plot_id),
+  data = df_south_cervid,
+  REML = TRUE
+)
+
+###############################################################################
+# SAVE HTML TABLES — ALL CERVID PELLETS
+###############################################################################
+
+sjPlot::tab_model(
+  m_plot_additive_cervid,
+  m_plot_species_cervid,
+  m_plot_region_cervid,
+  show.se = TRUE,
+  show.ci = FALSE,
+  show.stat = TRUE,
+  show.p = TRUE,
+  show.re.var = TRUE,
+  show.icc = TRUE,
+  show.r2 = TRUE,
+  show.ngroups = TRUE,
+  dv.labels = c(
+    "Plot additive — cervids",
+    "Plot species interaction — cervids",
+    "Plot regional interaction — cervids"
+  ),
+  file = file.path(tab_dir, "Table_S10_plot_level_models_cervids.html")
+)
+
+sjPlot::tab_model(
+  m_plot_downy_cervid,
+  m_plot_silver_cervid,
+  show.se = TRUE,
+  show.ci = FALSE,
+  show.stat = TRUE,
+  show.p = TRUE,
+  show.re.var = TRUE,
+  show.icc = TRUE,
+  show.r2 = TRUE,
+  show.ngroups = TRUE,
+  show.loglik = FALSE,
+  dv.labels = c(
+    "Downy birch — cervids",
+    "Silver birch — cervids"
+  ),
+  file = file.path(tab_dir, "Table_S11_plot_species_models_cervids.html")
+)
+
+sjPlot::tab_model(
+  m_plot_north_cervid,
+  m_plot_centre_cervid,
+  m_plot_south_cervid,
+  show.se = TRUE,
+  show.ci = FALSE,
+  show.stat = TRUE,
+  show.p = TRUE,
+  show.re.var = TRUE,
+  show.icc = TRUE,
+  show.r2 = TRUE,
+  show.ngroups = TRUE,
+  dv.labels = c(
+    "North — cervids",
+    "Centre — cervids",
+    "South — cervids"
+  ),
+  file = file.path(tab_dir, "Table_S12_plot_regional_models_cervids.html")
+)
 ###############################################################################
 # NESTED, ADDITIVE, SPECIES-SPECIFIC, AND REGIONAL MODEL COMPARISONS
 ###############################################################################
@@ -40,9 +608,11 @@ m_plot_nested <- lmer(
     species * north_c +
     species * stem_count_c +
     species * height_c +
+    species * moose_pellets_log +
+    pct +
     year +
     (1 | area/stand_id/plot_id),
-  data = birch_plot_long_damage,
+  data = birch_plot_long_pel_damage,
   REML = TRUE
 )
 
@@ -50,9 +620,11 @@ m_region_nested <- lmer(
   damage_N ~ species * prop_s_plot * region +
     species * height_c +
     species * stem_count_c +
+    species * moose_pellets_log +
+    pct +
     year +
     (1 | area/stand_id/plot_id),
-  data = df_region_plot,
+  data = df_full_ecology_plot,
   REML = TRUE
 )
 
@@ -66,9 +638,11 @@ m_plot_additive <- lmer(
     north_c +
     stem_count_c +
     height_c +
+    moose_pellets_log +
+    pct +
     year +
     (1 | area/stand_id/plot_id),
-  data = birch_plot_long_damage,
+  data = df_full_ecology_plot,
   REML = TRUE
 )
 
@@ -78,9 +652,11 @@ m_region_additive <- lmer(
     region +
     height_c +
     stem_count_c +
+    moose_pellets_log +
+    pct +
     year +
     (1 | area/stand_id/plot_id),
-  data = df_region_plot,
+  data = df_full_ecology_plot,
   REML = TRUE
 )
 
@@ -88,11 +664,11 @@ m_region_additive <- lmer(
 # 3) SPECIES-SPECIFIC MODELS
 ###############################################################################
 
-df_downy <- birch_plot_long_damage %>%
+df_downy <- birch_plot_long_pel_damage %>%
   filter(species == "Downy") %>%
   droplevels()
 
-df_silver <- birch_plot_long_damage %>%
+df_silver <- birch_plot_long_pel_damage %>%
   filter(species == "Silver") %>%
   droplevels()
 
@@ -100,6 +676,8 @@ m_downy_nested <- lmer(
   damage_N ~ prop_s_plot +
     north_c +
     stem_count_c +
+    moose_pellets_log +
+    pct +
     height_c +
     year +
     (1 | area/stand_id/plot_id),
@@ -111,6 +689,8 @@ m_silver_nested <- lmer(
   damage_N ~ prop_s_plot +
     north_c +
     stem_count_c +
+    moose_pellets_log +
+    pct +
     height_c +
     year +
     (1 | area/stand_id/plot_id),
@@ -122,15 +702,15 @@ m_silver_nested <- lmer(
 # 4) SEPARATE REGIONAL MODELS
 ###############################################################################
 
-df_north  <- df_region_plot %>% filter(region == "North") %>% droplevels()
-df_centre <- df_region_plot %>% filter(region == "Centre") %>% droplevels()
-df_south  <- df_region_plot %>% filter(region == "South") %>% droplevels()
+df_north  <- df_full_ecology_plot %>% filter(region == "North") %>% droplevels()
+df_centre <- df_full_ecology_plot %>% filter(region == "Centre") %>% droplevels()
+df_south  <- df_full_ecology_plot %>% filter(region == "South") %>% droplevels()
 
 m_north_nested <- lmer(
   damage_N ~ species * prop_s_plot +
     species * height_c +
     species * stem_count_c +
-    species * moose_pellets_log_mean +
+    species * moose_pellets_log +
     pct +
     year +
     (1 | area/stand_id/plot_id),
@@ -142,7 +722,7 @@ m_centre_nested <- lmer(
   damage_N ~ species * prop_s_plot +
     species * height_c +
     species * stem_count_c +
-    species * moose_pellets_log_mean +
+    species * moose_pellets_log +
     pct +
     year +
     (1 | area/stand_id/plot_id),
@@ -154,7 +734,7 @@ m_south_nested <- lmer(
   damage_N ~ species * prop_s_plot +
     species * height_c +
     species * stem_count_c +
-    species * moose_pellets_log_mean +
+    species * moose_pellets_log +
     pct +
     year +
     (1 | area/stand_id/plot_id),
@@ -5027,3 +5607,198 @@ tab_model(
   file = file.path(tab_dir, "Table_stand_region_specific_total_cervid.html")
 )
 
+###############################################################################
+# Regional prediction plots: prop_s_stand × species
+# Models:
+# m_stand_south_cervid
+# m_stand_centre_cervid
+# m_stand_north_cervid
+###############################################################################
+
+library(emmeans)
+library(ggplot2)
+library(dplyr)
+library(performance)
+library(patchwork)
+
+fig_dir <- "Figures"
+if (!dir.exists(fig_dir)) dir.create(fig_dir)
+
+make_region_prop_plot <- function(model, region_name) {
+  
+  pred <- emmeans(
+    model,
+    ~ species | prop_s_stand,
+    at = list(prop_s_stand = seq(0, 1, by = 0.02))
+  )
+  
+  pred_df <- as.data.frame(pred)
+  
+  r2 <- performance::r2_nakagawa(model)
+  R2m <- round(r2$R2_marginal, 3)
+  R2c <- round(r2$R2_conditional, 3)
+  
+  coef_table <- summary(model)$coefficients
+  
+  interaction_name <- grep(
+    "species.*:prop_s_stand|prop_s_stand:species",
+    rownames(coef_table),
+    value = TRUE
+  )
+  
+  interaction_p <- coef_table[interaction_name[1], "Pr(>|t|)"]
+  
+  interaction_label <- ifelse(
+    interaction_p < 0.001,
+    "Species × stand proportion: p < 0.001",
+    paste0("Species × stand proportion: p = ", signif(interaction_p, 3))
+  )
+  
+  ggplot(
+    pred_df,
+    aes(
+      x = prop_s_stand,
+      y = emmean,
+      colour = species,
+      fill = species
+    )
+  ) +
+    geom_ribbon(
+      aes(ymin = lower.CL, ymax = upper.CL),
+      alpha = 0.20,
+      colour = NA
+    ) +
+    geom_line(linewidth = 1.3) +
+    scale_colour_manual(
+      values = c(
+        Downy = "#3BA64C",
+        Silver = "#4C5C8C"
+      )
+    ) +
+    scale_fill_manual(
+      values = c(
+        Downy = "#3BA64C",
+        Silver = "#4C5C8C"
+      )
+    ) +
+    scale_x_continuous(
+      limits = c(0, 1),
+      breaks = c(0, 0.5, 1),
+      labels = c("Pure\nDowny", "Mixed", "Pure\nSilver")
+    ) +
+    labs(
+      title = region_name,
+      x = "Stand-level silver birch proportion",
+      y = "Predicted browsing damage (%)",
+      colour = "Species",
+      fill = "Species"
+    ) +
+    annotate(
+      "text",
+      x = 0.02,
+      y = max(pred_df$upper.CL, na.rm = TRUE),
+      hjust = 0,
+      vjust = 1,
+      size = 4,
+      label = paste0(
+        interaction_label,
+        "\nMarginal R² = ", R2m,
+        "\nConditional R² = ", R2c
+      )
+    ) +
+    theme_bw(base_size = 14) +
+    theme(
+      legend.position = "top",
+      plot.title = element_text(face = "bold"),
+      panel.grid.minor = element_blank()
+    )
+}
+
+###############################################################################
+# Create the three regional plots
+###############################################################################
+
+p_south <- make_region_prop_plot(m_stand_south_cervid, "South")
+p_centre <- make_region_prop_plot(m_stand_centre_cervid, "Centre")
+p_north <- make_region_prop_plot(m_stand_north_cervid, "North")
+
+###############################################################################
+# View separately
+###############################################################################
+
+p_south
+p_centre
+p_north
+
+###############################################################################
+# Save separately
+###############################################################################
+
+ggsave(
+  filename = file.path(fig_dir, "Figure_South_Stand_Cervid_PropS_Predictions.tiff"),
+  plot = p_south,
+  dpi = 600,
+  width = 180,
+  height = 140,
+  units = "mm",
+  compression = "lzw"
+)
+
+ggsave(
+  filename = file.path(fig_dir, "Figure_Centre_Stand_Cervid_PropS_Predictions.tiff"),
+  plot = p_centre,
+  dpi = 600,
+  width = 180,
+  height = 140,
+  units = "mm",
+  compression = "lzw"
+)
+
+ggsave(
+  filename = file.path(fig_dir, "Figure_North_Stand_Cervid_PropS_Predictions.tiff"),
+  plot = p_north,
+  dpi = 600,
+  width = 180,
+  height = 140,
+  units = "mm",
+  compression = "lzw"
+)
+
+###############################################################################
+# Optional: combine into one 3-panel figure
+###############################################################################
+
+p_combined <- p_south + p_centre + p_north +
+  plot_layout(ncol = 3, guides = "collect") &
+  theme(legend.position = "top")
+
+p_combined
+
+ggsave(
+  filename = file.path(fig_dir, "Figure_Regional_Stand_Cervid_PropS_Predictions.tiff"),
+  plot = p_combined,
+  dpi = 600,
+  width = 260,
+  height = 110,
+  units = "mm",
+  compression = "lzw"
+)
+
+#glmm
+m_stand_species_int_cervid <- lmer(
+  damage_N ~ species * prop_s_stand +
+    species * mean_north_c +
+    species * stem_count_c +
+    species * height_c +
+    species * total_cervid_pellets_log_mean +
+    pct +
+    year +
+    (1 | area/stand_id),
+  data = df_region_stand,
+  REML = TRUE
+)
+
+summary(m_stand_species_int_cervid)
+r.squaredGLMM(m_stand_species_int_cervid)
+drop1(update(m_stand_species_int_cervid, REML = FALSE), test = "Chisq")
+check_collinearity(m_stand_species_int_cervid)
