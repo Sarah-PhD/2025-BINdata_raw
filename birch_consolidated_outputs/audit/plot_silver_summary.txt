@@ -1,0 +1,40 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 15408.9
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.3097 -0.4496 -0.1363  0.2847  4.4331 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept) 191.3    13.83   
+ area          (Intercept) 112.7    10.61   
+ Residual                  261.7    16.18   
+Number of obs: 1772, groups:  stand_id:area, 362; area, 13
+
+Fixed effects:
+                           Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                22.62856    3.62107   18.08180   6.249 6.65e-06 ***
+prop_s_plot                 2.14506    1.95058 1755.65716   1.100 0.271612    
+north_c                     2.39255    1.05469   10.74553   2.268 0.044961 *  
+total_birch_c               0.03199    0.03275 1757.01251   0.977 0.328801    
+height_c                   -0.80421    0.43025 1756.71344  -1.869 0.061767 .  
+total_cervid_pellets_log    1.43742    0.39145 1733.37889   3.672 0.000248 ***
+pctPCT                     -4.32003    1.58151  934.29116  -2.732 0.006422 ** 
+year2025                   -4.81507    1.84780  313.01672  -2.606 0.009603 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) prp_s_ nrth_c ttl_b_ hght_c ttl___ pctPCT
+prop_s_plot -0.389                                          
+north_c     -0.005  0.062                                   
+totl_brch_c -0.048  0.162  0.005                            
+height_c     0.049 -0.109  0.037 -0.182                     
+ttl_crvd_p_ -0.131 -0.021 -0.003  0.024  0.004              
+pctPCT      -0.062 -0.027  0.005 -0.015  0.087 -0.018       
+year2025    -0.283  0.024 -0.005 -0.033 -0.022  0.124 -0.143

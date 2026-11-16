@@ -1,0 +1,46 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 33233.2
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.2323 -0.4730 -0.1579  0.2421  5.0050 
+
+Random effects:
+ Groups                Name        Variance  Std.Dev. 
+ plot_id:stand_id:area (Intercept) 4.091e-12 2.023e-06
+ stand_id:area         (Intercept) 1.351e+02 1.162e+01
+ area                  (Intercept) 8.391e+01 9.160e+00
+ Residual                          2.697e+02 1.642e+01
+Number of obs: 3853, groups:  plot_id:stand_id:area, 3050; stand_id:area, 489; area, 13
+
+Fixed effects:
+                           Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                15.82903    2.79748   13.06981   5.658 7.66e-05 ***
+speciesSilver               6.07251    0.73590 3442.53645   8.252  < 2e-16 ***
+prop_s_plot                 1.91476    1.21357 3820.07953   1.578  0.11470    
+north_c                     1.28395    0.86101   13.43864   1.491  0.15900    
+total_birch_c               0.03309    0.01837 3597.68517   1.802  0.07163 .  
+height_c                   -1.35769    0.27840 3840.04742  -4.877 1.12e-06 ***
+total_cervid_pellets_log    1.01883    0.28288 3839.53790   3.602  0.00032 ***
+pctPCT                     -3.18068    1.11977 1515.97075  -2.840  0.00456 ** 
+year2025                   -6.58193    1.31902  428.15220  -4.990 8.80e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) spcsSl prp_s_ nrth_c ttl_b_ hght_c ttl___ pctPCT
+speciesSlvr -0.028                                                 
+prop_s_plot -0.156 -0.439                                          
+north_c     -0.021  0.016  0.070                                   
+totl_brch_c -0.010  0.015  0.031 -0.008                            
+height_c     0.011 -0.060  0.040  0.017 -0.166                     
+ttl_crvd_p_ -0.106 -0.005 -0.042 -0.007  0.016 -0.005              
+pctPCT      -0.077  0.004 -0.003  0.011 -0.001  0.067 -0.003       
+year2025    -0.233 -0.016  0.009 -0.013 -0.026 -0.050  0.102 -0.115
+optimizer (bobyqa) convergence code: 0 (OK)
+boundary (singular) fit: see help('isSingular')
+

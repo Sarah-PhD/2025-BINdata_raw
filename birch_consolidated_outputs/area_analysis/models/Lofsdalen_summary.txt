@@ -1,0 +1,44 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: update(f, . ~ . + (1 | stand_id))
+   Data: dat
+Control: lme4::lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 313.6
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-1.5142 -0.5364 -0.1002  0.3174  3.4778 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ stand_id (Intercept)   0.0     0.00   
+ Residual             157.1    12.54   
+Number of obs: 46, groups:  stand_id, 37
+
+Fixed effects:
+                              Estimate Std. Error       df t value Pr(>|t|)    
+(Intercept)                    11.9881     3.3540  37.0000   3.574 0.000998 ***
+speciesSilver                  23.9493    13.2550  37.0000   1.807 0.078928 .  
+prop_s_stand                  -15.8759    13.3455  37.0000  -1.190 0.241779    
+stem_count_c                    0.3360     0.2366  37.0000   1.420 0.163941    
+height_c                       -3.7067     2.7438  37.0000  -1.351 0.184925    
+total_cervid_pellets_log_mean  12.7217     4.8767  37.0000   2.609 0.013035 *  
+pctPCT                         -3.8776     6.2381  37.0000  -0.622 0.538015    
+year2025                      -12.0366     4.6678  37.0000  -2.579 0.014031 *  
+speciesSilver:prop_s_stand    -17.9281    29.6039  37.0000  -0.606 0.548478    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) spcsSl prp_s_ stm_c_ hght_c tt____ pctPCT yr2025
+speciesSlvr -0.064                                                 
+prop_s_stnd -0.113  0.261                                          
+stem_cont_c -0.166  0.242  0.325                                   
+height_c     0.086  0.073  0.297 -0.201                            
+ttl_crvd___ -0.265 -0.099 -0.446 -0.209 -0.173                     
+pctPCT      -0.246  0.108  0.003  0.013  0.015 -0.312              
+year2025    -0.559 -0.294 -0.384 -0.221  0.041  0.322  0.174       
+spcsSlvr:__  0.094 -0.903 -0.428 -0.194 -0.107  0.073 -0.102  0.223
+optimizer (bobyqa) convergence code: 0 (OK)
+boundary (singular) fit: see help('isSingular')
+

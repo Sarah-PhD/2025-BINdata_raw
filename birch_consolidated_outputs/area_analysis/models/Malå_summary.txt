@@ -1,0 +1,39 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: update(f, . ~ . + (1 | stand_id))
+   Data: dat
+Control: lme4::lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 121.3
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-1.52127 -0.40046  0.05209  0.37673  1.09143 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ stand_id (Intercept) 64.03    8.002   
+ Residual             54.29    7.368   
+Number of obs: 22, groups:  stand_id, 15
+
+Fixed effects:
+                              Estimate Std. Error       df t value Pr(>|t|)  
+(Intercept)                    3.42511    5.61765 13.21259   0.610   0.5524  
+speciesSilver                 -2.19450    6.84185 13.42465  -0.321   0.7533  
+prop_s_stand                  -0.98000   13.54905 13.86819  -0.072   0.9434  
+stem_count_c                   0.07601    0.14362 13.81637   0.529   0.6050  
+height_c                      -0.31754    3.22450 10.10268  -0.098   0.9235  
+total_cervid_pellets_log_mean 11.55655   10.72539 11.40789   1.077   0.3035  
+pctPCT                        -8.17203   11.02000 13.63092  -0.742   0.4709  
+speciesSilver:prop_s_stand    29.01967   16.18396 12.89137   1.793   0.0964 .
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) spcsSl prp_s_ stm_c_ hght_c tt____ pctPCT
+speciesSlvr -0.496                                          
+prop_s_stnd -0.399  0.403                                   
+stem_cont_c -0.565  0.623  0.270                            
+height_c     0.354  0.142  0.083 -0.134                     
+ttl_crvd___ -0.573  0.202 -0.156  0.385 -0.269              
+pctPCT       0.175 -0.367  0.016 -0.723  0.015 -0.377       
+spcsSlvr:__  0.368 -0.777 -0.661 -0.467 -0.237 -0.131  0.272

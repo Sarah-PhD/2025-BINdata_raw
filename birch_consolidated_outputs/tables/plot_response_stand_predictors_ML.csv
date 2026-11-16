@@ -1,0 +1,3 @@
+"","npar","AIC","BIC","logLik","-2*log(L)","Chisq","Df","Pr(>Chisq)"
+"fit(stand_cov_add, plot_response_stand_cov, FALSE)",12,33263.7740989284,33338.8938068456,-16619.8870494642,33239.7740989284,NA,NA,NA
+"fit(stand_cov_int, plot_response_stand_cov, FALSE)",17,33156.3602205247,33262.7798067407,-16561.1801102623,33122.3602205247,117.413878403706,5,1.10750756517058e-23

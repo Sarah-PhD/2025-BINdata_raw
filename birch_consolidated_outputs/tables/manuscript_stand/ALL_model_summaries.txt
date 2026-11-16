@@ -1,0 +1,1138 @@
+
+
+====================================================
+MODEL: stand_add 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 6397.1
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.2711 -0.5127 -0.1583  0.3197  3.9412 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept)  78.51    8.860  
+ area          (Intercept)  75.71    8.701  
+ Residual                  232.08   15.234  
+Number of obs: 747, groups:  stand_id:area, 487; area, 13
+
+Fixed effects:
+                               Estimate Std. Error        df t value Pr(>|t|)    
+(Intercept)                    11.71441    3.09810  19.21949   3.781  0.00124 ** 
+speciesSilver                   5.59183    1.26115 369.27764   4.434 1.22e-05 ***
+prop_s_stand                    5.11761    2.65144 490.86365   1.930  0.05417 .  
+mean_north_c                    1.34138    0.84712  12.78514   1.583  0.13773    
+total_birch_c                   0.13578    0.04992 494.36201   2.720  0.00675 ** 
+height_c                       -3.96485    0.73971 729.67921  -5.360 1.12e-07 ***
+total_cervid_pellets_log_mean   4.07209    0.85257 496.23025   4.776 2.35e-06 ***
+pctPCT                         -4.44417    1.60785 463.45770  -2.764  0.00594 ** 
+year2025                       -3.81295    1.54944 468.28120  -2.461  0.01422 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) spcsSl prp_s_ mn_nr_ ttl_b_ hght_c tt____ pctPCT
+speciesSlvr -0.080                                                 
+prop_s_stnd -0.366 -0.238                                          
+mean_nrth_c -0.059  0.015  0.167                                   
+totl_brch_c -0.077  0.004  0.142  0.006                            
+height_c     0.007 -0.085  0.056  0.057 -0.093                     
+ttl_crvd___ -0.266 -0.047 -0.078 -0.031  0.039 -0.013              
+pctPCT      -0.075  0.028 -0.073  0.014 -0.054  0.107 -0.026       
+year2025    -0.300 -0.028  0.047 -0.010 -0.046 -0.089  0.267 -0.139
+
+
+====================================================
+MODEL: stand_int 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 6339.9
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.0673 -0.5072 -0.1146  0.3484  3.7158 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept)  81.35    9.019  
+ area          (Intercept)  83.55    9.141  
+ Residual                  211.32   14.537  
+Number of obs: 747, groups:  stand_id:area, 487; area, 13
+
+Fixed effects:
+                                             Estimate Std. Error        df t value Pr(>|t|)    
+(Intercept)                                  11.77164    3.23922  19.88030   3.634 0.001665 ** 
+speciesSilver                                12.05476    2.46725 478.74646   4.886 1.41e-06 ***
+prop_s_stand                                 10.43628    3.15002 698.91460   3.313 0.000970 ***
+mean_north_c                                  0.13084    0.90396  15.06084   0.145 0.886832    
+total_birch_c                                 0.19768    0.05705 704.37472   3.465 0.000562 ***
+height_c                                     -2.07350    1.02786 714.71261  -2.017 0.044037 *  
+total_cervid_pellets_log_mean                 4.24906    1.07123 722.97550   3.967 8.02e-05 ***
+pctPCT                                       -4.53778    1.57334 471.11600  -2.884 0.004104 ** 
+year2025                                     -5.18281    1.54074 490.14296  -3.364 0.000829 ***
+speciesSilver:prop_s_stand                  -12.39736    3.89728 502.16762  -3.181 0.001558 ** 
+speciesSilver:mean_north_c                    2.12326    0.43395 363.89872   4.893 1.50e-06 ***
+speciesSilver:total_birch_c                  -0.21549    0.08172 442.94564  -2.637 0.008661 ** 
+speciesSilver:height_c                       -0.71655    1.34475 533.16540  -0.533 0.594358    
+speciesSilver:total_cervid_pellets_log_mean  -0.55948    1.25145 435.41200  -0.447 0.655049    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+====================================================
+MODEL: plot_add 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 33233.2
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.2323 -0.4730 -0.1579  0.2421  5.0050 
+
+Random effects:
+ Groups                Name        Variance  Std.Dev. 
+ plot_id:stand_id:area (Intercept) 4.091e-12 2.023e-06
+ stand_id:area         (Intercept) 1.351e+02 1.162e+01
+ area                  (Intercept) 8.391e+01 9.160e+00
+ Residual                          2.697e+02 1.642e+01
+Number of obs: 3853, groups:  plot_id:stand_id:area, 3050; stand_id:area, 489; area, 13
+
+Fixed effects:
+                           Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                15.82903    2.79748   13.06981   5.658 7.66e-05 ***
+speciesSilver               6.07251    0.73590 3442.53645   8.252  < 2e-16 ***
+prop_s_plot                 1.91476    1.21357 3820.07953   1.578  0.11470    
+north_c                     1.28395    0.86101   13.43864   1.491  0.15900    
+total_birch_c               0.03309    0.01837 3597.68517   1.802  0.07163 .  
+height_c                   -1.35769    0.27840 3840.04742  -4.877 1.12e-06 ***
+total_cervid_pellets_log    1.01883    0.28288 3839.53790   3.602  0.00032 ***
+pctPCT                     -3.18068    1.11977 1515.97075  -2.840  0.00456 ** 
+year2025                   -6.58193    1.31902  428.15220  -4.990 8.80e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) spcsSl prp_s_ nrth_c ttl_b_ hght_c ttl___ pctPCT
+speciesSlvr -0.028                                                 
+prop_s_plot -0.156 -0.439                                          
+north_c     -0.021  0.016  0.070                                   
+totl_brch_c -0.010  0.015  0.031 -0.008                            
+height_c     0.011 -0.060  0.040  0.017 -0.166                     
+ttl_crvd_p_ -0.106 -0.005 -0.042 -0.007  0.016 -0.005              
+pctPCT      -0.077  0.004 -0.003  0.011 -0.001  0.067 -0.003       
+year2025    -0.233 -0.016  0.009 -0.013 -0.026 -0.050  0.102 -0.115
+optimizer (bobyqa) convergence code: 0 (OK)
+boundary (singular) fit: see help('isSingular')
+
+
+
+====================================================
+MODEL: plot_int 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 33100.6
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.3320 -0.4818 -0.1390  0.2473  4.6719 
+
+Random effects:
+ Groups                Name        Variance Std.Dev.
+ plot_id:stand_id:area (Intercept)   2.407   1.551  
+ stand_id:area         (Intercept) 130.459  11.422  
+ area                  (Intercept)  91.641   9.573  
+ Residual                          258.351  16.073  
+Number of obs: 3853, groups:  plot_id:stand_id:area, 3050; stand_id:area, 489; area, 13
+
+Fixed effects:
+                                         Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                              17.72310    2.90779   12.97706   6.095 3.84e-05 ***
+speciesSilver                             7.87352    1.37833 2834.71914   5.712 1.23e-08 ***
+prop_s_plot                               4.23284    1.56429 3836.61252   2.706  0.00684 ** 
+north_c                                   0.08300    0.89795   14.30024   0.092  0.92764    
+total_birch_c                             0.03516    0.02071 3677.15183   1.697  0.08972 .  
+height_c                                 -0.43972    0.36444 3778.37650  -1.207  0.22767    
+total_cervid_pellets_log                  0.73362    0.36764 3787.62933   1.995  0.04606 *  
+pctPCT                                   -3.42709    1.10255 1459.13427  -3.108  0.00192 ** 
+year2025                                 -7.33985    1.29948  432.40256  -5.648 2.94e-08 ***
+speciesSilver:prop_s_plot                -5.23529    2.13118 3320.39137  -2.457  0.01408 *  
+speciesSilver:north_c                     2.15441    0.22006 2212.31145   9.790  < 2e-16 ***
+speciesSilver:total_birch_c              -0.04266    0.03275 2705.49001  -1.303  0.19279    
+speciesSilver:height_c                   -1.12051    0.49433 3445.36940  -2.267  0.02347 *  
+speciesSilver:total_cervid_pellets_log    0.47636    0.46513 2619.93503   1.024  0.30586    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+====================================================
+MODEL: plot_response_stand_add 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 33228.8
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.2905 -0.4756 -0.1531  0.2588  4.8451 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept) 139.62   11.816  
+ area          (Intercept)  59.37    7.705  
+ Residual                  260.82   16.150  
+Number of obs: 3866, groups:  stand_id:area, 491; area, 13
+
+Fixed effects:
+                                Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                     11.04864    2.75691   20.45220   4.008 0.000666 ***
+speciesSilver                    6.68868    0.66564 3474.79088  10.048  < 2e-16 ***
+prop_s_stand                     3.35913    2.41878  441.81053   1.389 0.165601    
+mean_north_c                     1.05646    0.76278   12.72559   1.385 0.189847    
+total_birch_c                    0.08702    0.04341  384.82355   2.005 0.045686 *  
+height_c                        -5.66199    0.53716 1948.04897 -10.541  < 2e-16 ***
+total_cervid_pellets_log_mean    4.43449    0.79417  464.44449   5.584 4.01e-08 ***
+pctPCT                          -4.13755    1.11567 1558.93852  -3.709 0.000216 ***
+year2025                        -3.92599    1.38024  407.82510  -2.844 0.004673 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) spcsSl prp_s_ mn_nr_ ttl_b_ hght_c tt____ pctPCT
+speciesSlvr -0.014                                                 
+prop_s_stnd -0.396 -0.204                                          
+mean_nrth_c -0.068  0.011  0.192                                   
+totl_brch_c -0.085  0.008  0.137  0.003                            
+height_c     0.001 -0.089  0.036  0.053 -0.086                     
+ttl_crvd___ -0.280 -0.018 -0.093 -0.023  0.046 -0.019              
+pctPCT      -0.056  0.004 -0.036  0.010 -0.050  0.098 -0.021       
+year2025    -0.312 -0.024  0.034 -0.007 -0.054 -0.091  0.266 -0.118
+
+
+====================================================
+MODEL: plot_response_stand_int 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 33110.9
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.3974 -0.4830 -0.1388  0.2313  4.8981 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept) 128.00   11.314  
+ area          (Intercept)  67.11    8.192  
+ Residual                  254.67   15.958  
+Number of obs: 3866, groups:  stand_id:area, 491; area, 13
+
+Fixed effects:
+                                              Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                                   12.24632    2.85573   19.74114   4.288 0.000368 ***
+speciesSilver                                 10.65665    1.55468 3802.92758   6.855 8.31e-12 ***
+prop_s_stand                                   6.40340    2.60899  649.87760   2.454 0.014375 *  
+mean_north_c                                   0.01466    0.80595   13.77943   0.018 0.985747    
+total_birch_c                                  0.11866    0.04390  460.53705   2.703 0.007124 ** 
+height_c                                      -3.24817    0.69593 1912.75822  -4.667 3.26e-06 ***
+total_cervid_pellets_log_mean                  4.26019    0.86778  715.06256   4.909 1.13e-06 ***
+pctPCT                                        -4.11455    1.09090 1527.01415  -3.772 0.000168 ***
+year2025                                      -5.13995    1.34261  425.19599  -3.828 0.000148 ***
+speciesSilver:prop_s_stand                    -7.45176    2.46987 3677.54604  -3.017 0.002570 ** 
+speciesSilver:mean_north_c                     1.91533    0.23172 3757.96450   8.266  < 2e-16 ***
+speciesSilver:total_birch_c                   -0.15866    0.04842 3807.49416  -3.277 0.001059 ** 
+speciesSilver:height_c                        -1.48227    0.77700 3759.28939  -1.908 0.056508 .  
+speciesSilver:total_cervid_pellets_log_mean   -0.06114    0.73860 3846.21650  -0.083 0.934038    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+====================================================
+MODEL: stand_downy 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 3229.7
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.6432 -0.5150 -0.1337  0.3256  3.9400 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ area     (Intercept) 118.4    10.88   
+ Residual             240.5    15.51   
+Number of obs: 387, groups:  area, 13
+
+Fixed effects:
+                               Estimate Std. Error        df t value Pr(>|t|)    
+(Intercept)                    14.90837    3.70056  15.02022   4.029  0.00109 ** 
+prop_s_stand                    8.08697    3.07808 378.69834   2.627  0.00896 ** 
+mean_north_c                   -0.60273    1.02866  13.66992  -0.586  0.56747    
+total_birch_c                   0.15460    0.05293 373.92400   2.921  0.00370 ** 
+height_c                       -0.60775    0.98871 373.39852  -0.615  0.53913    
+total_cervid_pellets_log_mean   4.15914    1.02185 376.94570   4.070 5.73e-05 ***
+pctPCT                         -4.03232    1.86184 373.44249  -2.166  0.03096 *  
+year2025                       -7.74309    1.80726 376.93545  -4.284 2.33e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) prp_s_ mn_nr_ ttl_b_ hght_c tt____ pctPCT
+prop_s_stnd -0.302                                          
+mean_nrth_c -0.059  0.117                                   
+totl_brch_c -0.049  0.079 -0.014                            
+height_c     0.015  0.239  0.014 -0.105                     
+ttl_crvd___ -0.258 -0.100 -0.052  0.050 -0.088              
+pctPCT      -0.097 -0.037  0.042 -0.080  0.111 -0.050       
+year2025    -0.284 -0.058  0.000 -0.023 -0.257  0.273 -0.100
+
+
+====================================================
+MODEL: plot_downy 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 17419.3
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.6173 -0.3981 -0.1095  0.1622  5.5940 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept) 138.3    11.76   
+ area          (Intercept) 201.6    14.20   
+ Residual                  190.7    13.81   
+Number of obs: 2081, groups:  stand_id:area, 389; area, 13
+
+Fixed effects:
+                           Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                22.15967    4.21145    8.30455   5.262 0.000676 ***
+prop_s_plot                 1.14409    1.50499 2062.89971   0.760 0.447221    
+north_c                    -0.23795    1.23444   13.07204  -0.193 0.850110    
+total_birch_c               0.01688    0.01900 2055.33238   0.888 0.374674    
+height_c                    0.31866    0.34525 2055.33014   0.923 0.356125    
+total_cervid_pellets_log    0.63902    0.34314 2042.67900   1.862 0.062709 .  
+pctPCT                     -2.37832    1.30274 1074.94912  -1.826 0.068183 .  
+year2025                   -9.57662    1.50380  315.15159  -6.368 6.75e-10 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) prp_s_ nrth_c ttl_b_ hght_c ttl___ pctPCT
+prop_s_plot -0.098                                          
+north_c     -0.040  0.036                                   
+totl_brch_c -0.003 -0.066 -0.004                            
+height_c     0.019  0.163 -0.007 -0.185                     
+ttl_crvd_p_ -0.085 -0.052 -0.010  0.011 -0.013              
+pctPCT      -0.079  0.000  0.025  0.010  0.038 -0.006       
+year2025    -0.198  0.010 -0.006 -0.019 -0.098  0.101 -0.054
+
+
+====================================================
+MODEL: plot_response_stand_downy 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 17430.6
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.4760 -0.3966 -0.1055  0.1679  5.6878 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept) 129.8    11.39   
+ area          (Intercept) 127.4    11.29   
+ Residual                  189.7    13.77   
+Number of obs: 2087, groups:  stand_id:area, 389; area, 13
+
+Fixed effects:
+                                Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                     15.33226    3.68526   11.98585   4.160  0.00133 ** 
+prop_s_stand                     5.61330    2.79759  360.08047   2.006  0.04555 *  
+mean_north_c                    -0.57488    1.05179   11.99526  -0.547  0.59469    
+total_birch_c                    0.12215    0.04468  278.44252   2.734  0.00666 ** 
+height_c                        -0.89394    0.87053  325.44344  -1.027  0.30524    
+total_cervid_pellets_log_mean    4.43260    0.93443  363.47843   4.744 3.02e-06 ***
+pctPCT                          -3.16374    1.29109 1092.48066  -2.450  0.01442 *  
+year2025                        -7.49083    1.56712  314.46875  -4.780 2.70e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) prp_s_ mn_nr_ ttl_b_ hght_c tt____ pctPCT
+prop_s_stnd -0.273                                          
+mean_nrth_c -0.053  0.110                                   
+totl_brch_c -0.047  0.072 -0.012                            
+height_c     0.010  0.248  0.016 -0.086                     
+ttl_crvd___ -0.246 -0.093 -0.032  0.048 -0.090              
+pctPCT      -0.061 -0.017  0.029 -0.068  0.110 -0.062       
+year2025    -0.265 -0.058 -0.003 -0.049 -0.265  0.284 -0.085
+
+
+====================================================
+MODEL: stand_silver 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 3103.6
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.6347 -0.6241 -0.2314  0.4079  3.9497 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ area     (Intercept) 106.3    10.31   
+ Residual             322.9    17.97   
+Number of obs: 360, groups:  area, 13
+
+Fixed effects:
+                               Estimate Std. Error        df t value Pr(>|t|)    
+(Intercept)                    20.11228    4.26469  29.17024   4.716 5.51e-05 ***
+prop_s_stand                    1.72352    3.81169 348.10308   0.452 0.651430    
+mean_north_c                    2.60564    1.05258  10.49361   2.475 0.031770 *  
+total_birch_c                   0.02589    0.07719 350.79705   0.335 0.737513    
+height_c                       -2.11416    1.11056 349.17107  -1.904 0.057773 .  
+total_cervid_pellets_log_mean   4.06467    1.12853 351.41985   3.602 0.000362 ***
+pctPCT                         -4.92484    2.17353 348.67555  -2.266 0.024075 *  
+year2025                       -2.95052    2.16937 351.90654  -1.360 0.174675    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) prp_s_ mn_nr_ ttl_b_ hght_c tt____ pctPCT
+prop_s_stnd -0.548                                          
+mean_nrth_c -0.078  0.182                                   
+totl_brch_c -0.121  0.217  0.027                            
+height_c     0.057 -0.133  0.097 -0.128                     
+ttl_crvd___ -0.307 -0.040  0.006  0.022  0.061              
+pctPCT      -0.021 -0.119 -0.002 -0.020  0.101 -0.031       
+year2025    -0.389  0.143  0.017 -0.057 -0.017  0.298 -0.165
+
+
+====================================================
+MODEL: plot_silver 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 15408.9
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.3097 -0.4496 -0.1363  0.2847  4.4331 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept) 191.3    13.83   
+ area          (Intercept) 112.7    10.61   
+ Residual                  261.7    16.18   
+Number of obs: 1772, groups:  stand_id:area, 362; area, 13
+
+Fixed effects:
+                           Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                22.62856    3.62107   18.08180   6.249 6.65e-06 ***
+prop_s_plot                 2.14506    1.95058 1755.65716   1.100 0.271612    
+north_c                     2.39255    1.05469   10.74553   2.268 0.044961 *  
+total_birch_c               0.03199    0.03275 1757.01251   0.977 0.328801    
+height_c                   -0.80421    0.43025 1756.71344  -1.869 0.061767 .  
+total_cervid_pellets_log    1.43742    0.39145 1733.37889   3.672 0.000248 ***
+pctPCT                     -4.32003    1.58151  934.29116  -2.732 0.006422 ** 
+year2025                   -4.81507    1.84780  313.01672  -2.606 0.009603 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) prp_s_ nrth_c ttl_b_ hght_c ttl___ pctPCT
+prop_s_plot -0.389                                          
+north_c     -0.005  0.062                                   
+totl_brch_c -0.048  0.162  0.005                            
+height_c     0.049 -0.109  0.037 -0.182                     
+ttl_crvd_p_ -0.131 -0.021 -0.003  0.024  0.004              
+pctPCT      -0.062 -0.027  0.005 -0.015  0.087 -0.018       
+year2025    -0.283  0.024 -0.005 -0.033 -0.022  0.124 -0.143
+
+
+====================================================
+MODEL: plot_response_stand_silver 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 15451.4
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.4193 -0.4489 -0.1446  0.2831  4.4672 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept) 179.15   13.385  
+ area          (Intercept)  89.16    9.442  
+ Residual                  262.80   16.211  
+Number of obs: 1779, groups:  stand_id:area, 364; area, 13
+
+Fixed effects:
+                                Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                    19.575376   3.949722  32.575843   4.956 2.16e-05 ***
+prop_s_stand                    1.029661   3.452018 316.756462   0.298  0.76569    
+mean_north_c                    2.272127   0.963390  10.716206   2.358  0.03848 *  
+total_birch_c                  -0.003654   0.072118 333.225998  -0.051  0.95962    
+height_c                       -2.326223   1.011051 319.073396  -2.301  0.02205 *  
+total_cervid_pellets_log_mean   4.681398   1.033522 326.442374   4.530 8.30e-06 ***
+pctPCT                         -4.591126   1.565952 901.344038  -2.932  0.00345 ** 
+year2025                       -2.677932   1.909839 301.678118  -1.402  0.16189    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) prp_s_ mn_nr_ ttl_b_ hght_c tt____ pctPCT
+prop_s_stnd -0.563                                          
+mean_nrth_c -0.056  0.157                                   
+totl_brch_c -0.108  0.198  0.021                            
+height_c     0.076 -0.152  0.095 -0.138                     
+ttl_crvd___ -0.319 -0.020  0.005  0.022  0.036              
+pctPCT      -0.009 -0.088  0.003 -0.041  0.112 -0.031       
+year2025    -0.397  0.142  0.011 -0.064 -0.058  0.304 -0.156
+
+
+====================================================
+MODEL: stand_south 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 1808.2
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.3619 -0.6181 -0.1878  0.4354  3.3467 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept)  24.6162  4.9615 
+ area          (Intercept)   0.2879  0.5366 
+ Residual                  262.0791 16.1889 
+Number of obs: 218, groups:  stand_id:area, 149; area, 4
+
+Fixed effects:
+                                            Estimate Std. Error       df t value Pr(>|t|)    
+(Intercept)                                   7.7920     6.9530  30.0569   1.121  0.27130    
+speciesSilver                                13.1249     8.0274 116.3340   1.635  0.10475    
+prop_s_stand                                 19.2331     8.3340 123.6391   2.308  0.02267 *  
+total_birch_c                                 0.8912     0.1496 185.1630   5.957 1.27e-08 ***
+height_c                                     -5.7149     2.0699 194.1102  -2.761  0.00632 ** 
+total_cervid_pellets_log_mean                 4.9619     2.7824 200.6221   1.783  0.07605 .  
+pctPCT                                       -5.4726     2.5390 125.4195  -2.155  0.03304 *  
+year2025                                     -4.7131     2.6671  74.2846  -1.767  0.08132 .  
+speciesSilver:prop_s_stand                  -24.0066     9.7071 129.2984  -2.473  0.01469 *  
+speciesSilver:total_birch_c                  -0.9691     0.1828 120.4019  -5.301 5.30e-07 ***
+speciesSilver:height_c                        3.0324     2.4802 171.2344   1.223  0.22313    
+speciesSilver:total_cervid_pellets_log_mean  -4.3481     3.0718 153.4972  -1.415  0.15895    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+             (Intr) spcsSl prp_s_ ttl_b_ hght_c tt____ pctPCT yr2025 spcsSlvr:p__ spcsSlvr:t__ spcS:_
+speciesSlvr  -0.725                                                                                  
+prop_s_stnd  -0.858  0.711                                                                           
+totl_brch_c  -0.056  0.010 -0.009                                                                    
+height_c     -0.464  0.449  0.542 -0.039                                                             
+ttl_crvd___  -0.521  0.403  0.227  0.001  0.212                                                      
+pctPCT       -0.186 -0.014  0.026  0.090  0.093  0.053                                               
+year2025     -0.186 -0.108 -0.027  0.039 -0.227  0.094 -0.170                                        
+spcsSlvr:p__  0.667 -0.892 -0.827  0.025 -0.486 -0.180  0.028  0.134                                 
+spcsSlvr:t__  0.045 -0.020  0.012 -0.781  0.042 -0.001 -0.041 -0.081  0.012                          
+spcsSlvr:h_   0.367 -0.448 -0.447  0.042 -0.838 -0.172 -0.059  0.251  0.412       -0.140             
+spcsSl:____   0.429 -0.446 -0.207  0.014 -0.207 -0.870  0.024  0.002  0.163       -0.001        0.199
+
+
+====================================================
+MODEL: plot_south 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 9305.4
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.2561 -0.5243 -0.1767  0.2166  4.3711 
+
+Random effects:
+ Groups                Name        Variance Std.Dev.
+ plot_id:stand_id:area (Intercept)   0.000   0.00   
+ stand_id:area         (Intercept) 119.243  10.92   
+ area                  (Intercept)   5.569   2.36   
+ Residual                          313.930  17.72   
+Number of obs: 1066, groups:  plot_id:stand_id:area, 860; stand_id:area, 148; area, 4
+
+Fixed effects:
+                                         Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                              18.45876    3.18207    7.88514   5.801 0.000427 ***
+speciesSilver                            -0.77974    3.27547  975.11591  -0.238 0.811889    
+prop_s_plot                               9.34721    3.67587 1030.86401   2.543 0.011140 *  
+total_birch_c                             0.15928    0.05579 1035.21840   2.855 0.004393 ** 
+height_c                                 -3.89682    0.80698 1045.37896  -4.829 1.58e-06 ***
+total_cervid_pellets_log                  1.81591    0.95200  997.14342   1.907 0.056748 .  
+pctPCT                                   -3.17645    1.79761  596.48377  -1.767 0.077732 .  
+year2025                                 -6.81404    2.39052  118.94196  -2.850 0.005148 ** 
+speciesSilver:prop_s_plot               -10.29740    4.65154  903.20955  -2.214 0.027094 *  
+speciesSilver:total_birch_c              -0.25079    0.06869  993.81357  -3.651 0.000275 ***
+speciesSilver:height_c                    1.85291    0.93445 1032.95393   1.983 0.047644 *  
+speciesSilver:total_cervid_pellets_log   -1.09501    1.05999  987.81644  -1.033 0.301839    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+             (Intr) spcsSl prp_s_ ttl_b_ hght_c ttl___ pctPCT yr2025 spcsSlvr:p__ spcsSlvr:t__ spcS:_
+speciesSlvr  -0.320                                                                                  
+prop_s_plot  -0.574  0.441                                                                           
+totl_brch_c   0.025 -0.047 -0.093                                                                    
+height_c     -0.171  0.293  0.283 -0.135                                                             
+ttl_crvd_p_  -0.302  0.253  0.072 -0.060  0.104                                                      
+pctPCT       -0.119 -0.018 -0.024  0.035  0.031 -0.022                                               
+year2025     -0.383 -0.034  0.037 -0.006 -0.098  0.060 -0.231                                        
+spcsSlvr:p__  0.259 -0.834 -0.694  0.087 -0.298 -0.052  0.031  0.038                                 
+spcsSlvr:t__ -0.043  0.002  0.113 -0.717  0.086  0.055 -0.009 -0.025 -0.029                          
+spcsSlvr:h_   0.152 -0.272 -0.222  0.126 -0.809 -0.105  0.011  0.083  0.203       -0.178             
+spcsSlv:___   0.223 -0.299 -0.075  0.060 -0.120 -0.841  0.040  0.002  0.052       -0.042        0.126
+optimizer (bobyqa) convergence code: 0 (OK)
+boundary (singular) fit: see help('isSingular')
+
+
+
+====================================================
+MODEL: plot_response_stand_south 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 9274.3
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.4353 -0.4541 -0.1491  0.2040  4.6811 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept) 130.347  11.417  
+ area          (Intercept)   2.093   1.447  
+ Residual                  285.768  16.905  
+Number of obs: 1073, groups:  stand_id:area, 150; area, 4
+
+Fixed effects:
+                                             Estimate Std. Error        df t value Pr(>|t|)    
+(Intercept)                                   11.0038     5.6804   17.6453   1.937  0.06891 .  
+speciesSilver                                  8.0815     4.2720 1047.4968   1.892  0.05880 .  
+prop_s_stand                                  12.7686     6.4244   73.2970   1.988  0.05060 .  
+total_birch_c                                  0.8520     0.1233  317.5263   6.910 2.65e-11 ***
+height_c                                      -6.0428     1.2557  952.8154  -4.812 1.74e-06 ***
+total_cervid_pellets_log_mean                  6.0118     2.0973  504.5059   2.866  0.00432 ** 
+pctPCT                                        -2.8403     1.7686  659.2694  -1.606  0.10877    
+year2025                                      -6.1847     2.5371   82.4747  -2.438  0.01693 *  
+speciesSilver:prop_s_stand                   -14.5012     5.6242 1010.7329  -2.578  0.01007 *  
+speciesSilver:total_birch_c                   -0.8848     0.1128 1036.1736  -7.841 1.10e-14 ***
+speciesSilver:height_c                         1.7009     1.4099 1012.3833   1.206  0.22796    
+speciesSilver:total_cervid_pellets_log_mean   -4.8067     1.8903 1052.2405  -2.543  0.01114 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+             (Intr) spcsSl prp_s_ ttl_b_ hght_c tt____ pctPCT yr2025 spcsSlvr:p__ spcsSlvr:t__ spcS:_
+speciesSlvr  -0.529                                                                                  
+prop_s_stnd  -0.845  0.562                                                                           
+totl_brch_c  -0.041  0.009 -0.001                                                                    
+height_c     -0.421  0.577  0.469 -0.069                                                             
+ttl_crvd___  -0.497  0.439  0.204  0.039  0.256                                                      
+pctPCT       -0.153  0.001  0.056  0.050  0.077  0.042                                               
+year2025     -0.364 -0.041  0.136 -0.049 -0.085  0.158 -0.176                                        
+spcsSlvr:p__  0.490 -0.855 -0.694  0.037 -0.568 -0.211 -0.007  0.030                                 
+spcsSlvr:t__  0.057 -0.031 -0.007 -0.672  0.028 -0.030 -0.034 -0.047  0.024                          
+spcsSlvr:h_   0.272 -0.522 -0.285  0.085 -0.707 -0.209 -0.021  0.120  0.354       -0.212             
+spcsSl:____   0.369 -0.545 -0.207 -0.013 -0.287 -0.779  0.034 -0.013  0.226        0.022        0.270
+
+
+====================================================
+MODEL: stand_centre 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 1249.9
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-2.34500 -0.34688 -0.06641  0.30425  3.01532 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept)  94.94    9.744  
+ area          (Intercept) 153.13   12.375  
+ Residual                   97.73    9.886  
+Number of obs: 161, groups:  stand_id:area, 105; area, 3
+
+Fixed effects:
+                                             Estimate Std. Error        df t value Pr(>|t|)   
+(Intercept)                                  14.32962    7.84622   2.40955   1.826  0.18736   
+speciesSilver                                11.47224    4.03651  83.22068   2.842  0.00564 **
+prop_s_stand                                  1.49593    5.08530 138.08376   0.294  0.76907   
+total_birch_c                                 0.14883    0.15793 128.90617   0.942  0.34776   
+height_c                                     -0.43481    1.91243 145.17728  -0.227  0.82047   
+total_cervid_pellets_log_mean                 5.58553    2.29559 131.42701   2.433  0.01631 * 
+pctPCT                                       -0.60148    3.61167 104.88560  -0.167  0.86805   
+year2025                                     -6.20658    2.74173  98.86057  -2.264  0.02578 * 
+speciesSilver:prop_s_stand                  -11.21330    6.39238  85.64627  -1.754  0.08298 . 
+speciesSilver:total_birch_c                  -0.02103    0.19173  69.92419  -0.110  0.91298   
+speciesSilver:height_c                        1.14936    2.73526  79.94782   0.420  0.67546   
+speciesSilver:total_cervid_pellets_log_mean   5.46105    2.17606  78.61525   2.510  0.01414 * 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+             (Intr) spcsSl prp_s_ ttl_b_ hght_c tt____ pctPCT yr2025 spcsSlvr:p__ spcsSlvr:t__ spcS:_
+speciesSlvr  -0.076                                                                                  
+prop_s_stnd  -0.202  0.322                                                                           
+totl_brch_c   0.077  0.002  0.033                                                                    
+height_c      0.012  0.041  0.118 -0.145                                                             
+ttl_crvd___  -0.204  0.022 -0.155 -0.094 -0.014                                                      
+pctPCT       -0.015  0.114  0.033  0.176  0.000 -0.165                                               
+year2025     -0.201 -0.143 -0.079 -0.131 -0.046  0.277 -0.052                                        
+spcsSlvr:p__  0.054 -0.826 -0.473 -0.008 -0.128  0.118 -0.088  0.135                                 
+spcsSlvr:t__ -0.016  0.005  0.040 -0.398  0.035 -0.038  0.031 -0.023  0.081                          
+spcsSlvr:h_   0.002  0.233  0.024  0.099 -0.478 -0.036  0.049 -0.006 -0.195       -0.175             
+spcsSl:____   0.050 -0.159  0.031 -0.056  0.018 -0.448 -0.041 -0.011 -0.178        0.105        0.005
+
+
+====================================================
+MODEL: plot_centre 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 7179.2
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.7626 -0.4168 -0.0957  0.2627  5.0077 
+
+Random effects:
+ Groups                Name        Variance Std.Dev.
+ plot_id:stand_id:area (Intercept)  32.75    5.723  
+ stand_id:area         (Intercept) 108.95   10.438  
+ area                  (Intercept) 279.58   16.721  
+ Residual                          128.49   11.336  
+Number of obs: 887, groups:  plot_id:stand_id:area, 695; stand_id:area, 108; area, 3
+
+Fixed effects:
+                                        Estimate Std. Error        df t value Pr(>|t|)    
+(Intercept)                             19.49038    9.85574   2.07220   1.978 0.182133    
+speciesSilver                            4.25540    2.22127 398.58360   1.916 0.056111 .  
+prop_s_plot                              1.03940    2.58442 860.56857   0.402 0.687652    
+total_birch_c                            0.07154    0.04759 839.00662   1.503 0.133148    
+height_c                                 1.21651    0.70483 828.70395   1.726 0.084728 .  
+total_cervid_pellets_log                -0.63344    0.71419 847.05893  -0.887 0.375363    
+pctPCT                                   0.50235    2.84822 196.15301   0.176 0.860183    
+year2025                                -8.53248    2.34762  93.00478  -3.635 0.000456 ***
+speciesSilver:prop_s_plot                2.52995    3.48657 532.76732   0.726 0.468387    
+speciesSilver:total_birch_c             -0.07299    0.06230 364.19446  -1.172 0.242111    
+speciesSilver:height_c                  -1.07825    0.95540 600.96970  -1.129 0.259523    
+speciesSilver:total_cervid_pellets_log   2.82126    0.86140 456.19320   3.275 0.001136 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+             (Intr) spcsSl prp_s_ ttl_b_ hght_c ttl___ pctPCT yr2025 spcsSlvr:p__ spcsSlvr:t__ spcS:_
+speciesSlvr  -0.033                                                                                  
+prop_s_plot  -0.068  0.389                                                                           
+totl_brch_c   0.020 -0.008 -0.097                                                                    
+height_c      0.014 -0.013  0.122 -0.189                                                             
+ttl_crvd_p_  -0.053  0.130  0.035 -0.024 -0.020                                                      
+pctPCT       -0.050  0.046  0.050  0.033  0.004 -0.047                                               
+year2025     -0.113 -0.012 -0.021 -0.023 -0.028  0.064  0.082                                        
+spcsSlvr:p__  0.029 -0.845 -0.641  0.045 -0.096 -0.022 -0.049  0.008                                 
+spcsSlvr:t__ -0.007 -0.113  0.127 -0.515  0.105 -0.017  0.011 -0.005  0.062                          
+spcsSlvr:h_  -0.009  0.171 -0.017  0.099 -0.597 -0.010  0.029  0.010 -0.087       -0.174             
+spcsSlv:___   0.021 -0.211 -0.065 -0.005  0.020 -0.598 -0.025 -0.008  0.016        0.037        0.024
+
+
+====================================================
+MODEL: plot_response_stand_centre 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 7145.3
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-4.3771 -0.4327 -0.0925  0.2334  6.0016 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept)  86.94    9.324  
+ area          (Intercept)  91.94    9.588  
+ Residual                  153.44   12.387  
+Number of obs: 890, groups:  stand_id:area, 108; area, 3
+
+Fixed effects:
+                                             Estimate Std. Error        df t value Pr(>|t|)    
+(Intercept)                                  13.40608    6.18852   2.43781   2.166  0.13938    
+speciesSilver                                 6.20653    2.59438 876.12772   2.392  0.01695 *  
+prop_s_stand                                  0.16997    4.24008 148.93443   0.040  0.96808    
+total_birch_c                                 0.11622    0.12033  96.73095   0.966  0.33655    
+height_c                                      0.23501    1.46299 276.97086   0.161  0.87250    
+total_cervid_pellets_log_mean                 5.19466    1.97822 138.62849   2.626  0.00961 ** 
+pctPCT                                       -1.86411    2.66960 196.14318  -0.698  0.48583    
+year2025                                     -6.01270    2.23021  88.81468  -2.696  0.00839 ** 
+speciesSilver:prop_s_stand                   -6.01563    4.18236 876.82387  -1.438  0.15070    
+speciesSilver:total_birch_c                   0.02349    0.09907 868.74870   0.237  0.81263    
+speciesSilver:height_c                       -1.66805    1.60691 873.93791  -1.038  0.29953    
+speciesSilver:total_cervid_pellets_log_mean   9.50060    1.46755 876.61820   6.474 1.59e-10 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+             (Intr) spcsSl prp_s_ ttl_b_ hght_c tt____ pctPCT yr2025 spcsSlvr:p__ spcsSlvr:t__ spcS:_
+speciesSlvr  -0.049                                                                                  
+prop_s_stnd  -0.220  0.263                                                                           
+totl_brch_c   0.072  0.011  0.039                                                                    
+height_c      0.027  0.037  0.085 -0.146                                                             
+ttl_crvd___  -0.232  0.020 -0.154 -0.097 -0.026                                                      
+pctPCT       -0.017  0.061  0.013  0.131  0.003 -0.159                                               
+year2025     -0.222 -0.072 -0.075 -0.128 -0.066  0.272  0.018                                        
+spcsSlvr:p__  0.034 -0.856 -0.394  0.021 -0.157  0.096 -0.045  0.084                                 
+spcsSlvr:t__ -0.010 -0.116  0.076 -0.283  0.011 -0.023  0.022  0.006  0.067                          
+spcsSlvr:h_   0.006  0.192  0.022  0.082 -0.430 -0.053  0.031 -0.022 -0.180       -0.129             
+spcsSl:____   0.046 -0.199  0.021 -0.031  0.090 -0.337 -0.048 -0.037 -0.130        0.094        0.052
+
+
+====================================================
+MODEL: stand_north 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 3086.1
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-1.8345 -0.4648 -0.0853  0.3197  3.9372 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept) 141.68   11.903  
+ area          (Intercept)  72.81    8.533  
+ Residual                  159.09   12.613  
+Number of obs: 368, groups:  stand_id:area, 233; area, 6
+
+Fixed effects:
+                                             Estimate Std. Error        df t value Pr(>|t|)    
+(Intercept)                                  11.43101    4.19868   8.32373   2.723 0.025214 *  
+speciesSilver                                10.79870    2.90342 229.03807   3.719 0.000251 ***
+prop_s_stand                                  8.30859    4.35825 320.76724   1.906 0.057491 .  
+total_birch_c                                 0.04704    0.06783 310.98263   0.694 0.488507    
+height_c                                      0.90906    1.45195 354.02366   0.626 0.531654    
+total_cervid_pellets_log_mean                 3.93050    1.35600 307.42698   2.899 0.004018 ** 
+pctPCT                                       -5.73815    2.43797 232.95409  -2.354 0.019421 *  
+year2025                                     -4.44523    2.35851 235.39262  -1.885 0.060694 .  
+speciesSilver:prop_s_stand                   -2.17167    5.13952 235.07047  -0.423 0.673014    
+speciesSilver:total_birch_c                   0.10749    0.09715 199.33160   1.106 0.269890    
+speciesSilver:height_c                       -1.97210    1.80450 212.68408  -1.093 0.275682    
+speciesSilver:total_cervid_pellets_log_mean   1.21899    1.54150 178.91366   0.791 0.430121    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+             (Intr) spcsSl prp_s_ ttl_b_ hght_c tt____ pctPCT yr2025 spcsSlvr:p__ spcsSlvr:t__ spcS:_
+speciesSlvr  -0.132                                                                                  
+prop_s_stnd  -0.203  0.188                                                                           
+totl_brch_c  -0.093  0.068  0.151                                                                    
+height_c      0.032  0.203  0.207 -0.130                                                             
+ttl_crvd___  -0.287  0.118 -0.180  0.075 -0.102                                                      
+pctPCT       -0.071  0.090 -0.101 -0.161  0.143 -0.055                                               
+year2025     -0.278 -0.083 -0.092 -0.031 -0.153  0.254 -0.127                                        
+spcsSlvr:p__  0.082 -0.672 -0.447 -0.030 -0.299  0.113 -0.076  0.047                                 
+spcsSlvr:t__  0.054 -0.296 -0.054 -0.357  0.032 -0.052  0.006 -0.028  0.278                          
+spcsSlvr:h_   0.005 -0.006 -0.139  0.072 -0.524  0.021 -0.036  0.054  0.137        0.008             
+spcsSl:____   0.091 -0.380  0.101 -0.059  0.018 -0.414 -0.038  0.037 -0.185        0.060        0.078
+
+
+====================================================
+MODEL: plot_north 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 16331.3
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.6816 -0.4990 -0.1247  0.2986  4.5903 
+
+Random effects:
+ Groups                Name        Variance Std.Dev.
+ plot_id:stand_id:area (Intercept)  22.59    4.752  
+ stand_id:area         (Intercept) 151.52   12.309  
+ area                  (Intercept)  73.57    8.577  
+ Residual                          240.26   15.500  
+Number of obs: 1900, groups:  plot_id:stand_id:area, 1495; stand_id:area, 233; area, 6
+
+Fixed effects:
+                                         Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                             1.759e+01  3.839e+00  6.152e+00   4.582 0.003532 ** 
+speciesSilver                           1.114e+01  1.895e+00  1.408e+03   5.877 5.21e-09 ***
+prop_s_plot                             1.520e+00  2.159e+00  1.887e+03   0.704 0.481572    
+total_birch_c                          -2.112e-03  2.511e-02  1.728e+03  -0.084 0.932965    
+height_c                                8.578e-01  4.813e-01  1.877e+03   1.782 0.074877 .  
+total_cervid_pellets_log                5.066e-01  4.687e-01  1.833e+03   1.081 0.279832    
+pctPCT                                 -5.857e+00  1.707e+00  6.358e+02  -3.432 0.000637 ***
+year2025                               -6.515e+00  2.009e+00  2.052e+02  -3.242 0.001385 ** 
+speciesSilver:prop_s_plot              -1.364e+00  2.995e+00  1.569e+03  -0.455 0.648859    
+speciesSilver:total_birch_c             1.276e-01  4.706e-02  1.284e+03   2.711 0.006802 ** 
+speciesSilver:height_c                 -1.556e+00  7.898e-01  1.544e+03  -1.970 0.048985 *  
+speciesSilver:total_cervid_pellets_log  1.200e+00  6.501e-01  1.193e+03   1.846 0.065180 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+             (Intr) spcsSl prp_s_ ttl_b_ hght_c ttl___ pctPCT yr2025 spcsSlvr:p__ spcsSlvr:t__ spcS:_
+speciesSlvr  -0.054                                                                                  
+prop_s_plot  -0.087  0.220                                                                           
+totl_brch_c  -0.019  0.016 -0.073                                                                    
+height_c      0.018  0.094  0.184 -0.194                                                             
+ttl_crvd_p_  -0.115  0.143 -0.122  0.046 -0.010                                                      
+pctPCT       -0.098  0.007 -0.008 -0.013  0.058  0.011                                               
+year2025     -0.248 -0.009 -0.014 -0.024 -0.054  0.083 -0.090                                        
+spcsSlvr:p__  0.043 -0.744 -0.587  0.050 -0.194  0.066 -0.013 -0.011                                 
+spcsSlvr:t__  0.011 -0.201  0.073 -0.315  0.053 -0.022 -0.028  0.009  0.119                          
+spcsSlvr:h_   0.002  0.092 -0.094  0.071 -0.437 -0.024 -0.008  0.008  0.048       -0.085             
+spcsSlv:___   0.042 -0.330  0.099 -0.038 -0.007 -0.497 -0.011  0.007 -0.071        0.032        0.036
+
+
+====================================================
+MODEL: plot_response_stand_north 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 16344.8
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.0816 -0.5352 -0.1207  0.3185  4.8939 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept) 140.62   11.858  
+ area          (Intercept)  67.88    8.239  
+ Residual                  263.22   16.224  
+Number of obs: 1903, groups:  stand_id:area, 233; area, 6
+
+Fixed effects:
+                                              Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                                   11.84453    3.93124    7.71701   3.013 0.017453 *  
+speciesSilver                                 12.15886    2.16954 1849.96449   5.604 2.40e-08 ***
+prop_s_stand                                   5.88902    3.71447  293.30912   1.585 0.113947    
+total_birch_c                                  0.03178    0.05317  201.16532   0.598 0.550749    
+height_c                                       0.51612    1.13225  552.76770   0.456 0.648686    
+total_cervid_pellets_log_mean                  4.38630    1.17537  265.68029   3.732 0.000232 ***
+pctPCT                                        -6.63400    1.69419  663.87746  -3.916 9.94e-05 ***
+year2025                                      -4.47299    2.05128  203.86025  -2.181 0.030359 *  
+speciesSilver:prop_s_stand                    -2.80398    3.62503 1787.03593  -0.774 0.439326    
+speciesSilver:total_birch_c                    0.06071    0.06633 1850.91409   0.915 0.360135    
+speciesSilver:height_c                        -2.40965    1.16764 1889.37098  -2.064 0.039183 *  
+speciesSilver:total_cervid_pellets_log_mean    0.79826    1.00315 1845.43294   0.796 0.426279    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+             (Intr) spcsSl prp_s_ ttl_b_ hght_c tt____ pctPCT yr2025 spcsSlvr:p__ spcsSlvr:t__ spcS:_
+speciesSlvr  -0.061                                                                                  
+prop_s_stnd  -0.191  0.170                                                                           
+totl_brch_c  -0.094  0.029  0.150                                                                    
+height_c      0.025  0.317  0.225 -0.079                                                             
+ttl_crvd___  -0.274  0.072 -0.184  0.059 -0.108                                                      
+pctPCT       -0.043  0.055 -0.065 -0.121  0.124 -0.071                                               
+year2025     -0.287 -0.070 -0.086 -0.047 -0.164  0.280 -0.112                                        
+spcsSlvr:p__  0.040 -0.749 -0.361  0.009 -0.404  0.084 -0.064  0.051                                 
+spcsSlvr:t__  0.026 -0.273  0.009 -0.161  0.012 -0.036 -0.009  0.000  0.200                          
+spcsSlvr:h_   0.010 -0.079 -0.127  0.039 -0.445  0.022 -0.028  0.048  0.151        0.008             
+spcsSl:____   0.060 -0.379  0.069 -0.046  0.016 -0.297 -0.004  0.016 -0.133        0.041        0.088
+
+
+====================================================
+MODEL: stand_region_interaction 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 6277.6
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.0039 -0.5138 -0.0984  0.3346  3.7145 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept)  86.94    9.324  
+ area          (Intercept)  85.85    9.266  
+ Residual                  201.07   14.180  
+Number of obs: 747, groups:  stand_id:area, 487; area, 13
+
+Fixed effects:
+                                             Estimate Std. Error        df t value Pr(>|t|)    
+(Intercept)                                   5.97099    7.73141  51.64573   0.772 0.443455    
+speciesSilver                                14.42568    6.05151 335.93401   2.384 0.017689 *  
+prop_s_stand                                 26.55655    7.58211 714.61185   3.503 0.000490 ***
+regionCentre                                  9.95131    9.70861  26.04059   1.025 0.314792    
+regionNorth                                   4.65681    8.54555  30.22806   0.545 0.589793    
+total_birch_c                                 0.18359    0.05703 696.84496   3.219 0.001345 ** 
+height_c                                     -1.38980    1.03491 708.40263  -1.343 0.179730    
+total_cervid_pellets_log_mean                 4.39974    1.07277 717.53095   4.101 4.58e-05 ***
+pctPCT                                       -4.90441    1.58151 470.45405  -3.101 0.002044 ** 
+year2025                                     -5.42311    1.55776 486.58229  -3.481 0.000544 ***
+speciesSilver:prop_s_stand                  -33.12206    7.92452 400.74316  -4.180 3.59e-05 ***
+speciesSilver:regionCentre                   -4.26201    7.92861 396.85574  -0.538 0.591190    
+speciesSilver:regionNorth                    -0.81101    6.49797 340.73341  -0.125 0.900748    
+prop_s_stand:regionCentre                   -25.47966    9.66247 707.44347  -2.637 0.008549 ** 
+prop_s_stand:regionNorth                    -19.01482    8.53530 706.02952  -2.228 0.026209 *  
+speciesSilver:total_birch_c                  -0.17805    0.08132 439.16177  -2.189 0.029089 *  
+speciesSilver:height_c                       -1.30083    1.32781 521.91702  -0.980 0.327698    
+speciesSilver:total_cervid_pellets_log_mean  -0.60982    1.24346 434.77319  -0.490 0.624082    
+speciesSilver:prop_s_stand:regionCentre      30.17558   11.25775 447.13202   2.680 0.007624 ** 
+speciesSilver:prop_s_stand:regionNorth       29.96639    9.27982 392.36261   3.229 0.001346 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+====================================================
+MODEL: plot_region_interaction 
+====================================================
+
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 33015.5
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.2537 -0.4999 -0.1301  0.2508  4.8219 
+
+Random effects:
+ Groups                Name        Variance Std.Dev.
+ plot_id:stand_id:area (Intercept)   4.42    2.102  
+ stand_id:area         (Intercept) 131.55   11.470  
+ area                  (Intercept)  94.10    9.701  
+ Residual                          252.85   15.901  
+Number of obs: 3853, groups:  plot_id:stand_id:area, 3050; stand_id:area, 489; area, 13
+
+Fixed effects:
+                                         Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                              18.63022    5.52748   14.09901   3.370 0.004534 ** 
+speciesSilver                             1.46518    2.77554 2411.53507   0.528 0.597624    
+prop_s_plot                              14.51371    3.24369 3759.25514   4.474 7.89e-06 ***
+regionCentre                             -0.49431    8.01074   11.57565  -0.062 0.951850    
+regionNorth                              -1.54698    6.81765   11.87597  -0.227 0.824354    
+total_birch_c                             0.03351    0.02063 3679.98116   1.624 0.104357    
+height_c                                 -0.31143    0.36280 3767.27939  -0.858 0.390719    
+total_cervid_pellets_log                  0.69880    0.36778 3779.32528   1.900 0.057503 .  
+pctPCT                                   -3.65465    1.10185 1478.18215  -3.317 0.000933 ***
+year2025                                 -7.42057    1.30516  435.82438  -5.686 2.39e-08 ***
+speciesSilver:prop_s_plot               -17.21459    4.08736 3092.28450  -4.212 2.61e-05 ***
+speciesSilver:regionCentre                3.14433    3.94108 2494.95834   0.798 0.425042    
+speciesSilver:regionNorth                10.99596    3.24408 2519.00671   3.390 0.000711 ***
+prop_s_plot:regionCentre                -13.72106    4.53003 3808.98868  -3.029 0.002471 ** 
+prop_s_plot:regionNorth                 -14.62519    3.82992 3798.83281  -3.819 0.000136 ***
+speciesSilver:total_birch_c              -0.03907    0.03254 2676.05800  -1.201 0.229913    
+speciesSilver:height_c                   -1.14028    0.48966 3412.45835  -2.329 0.019931 *  
+speciesSilver:total_cervid_pellets_log    0.58896    0.46552 2628.89271   1.265 0.205921    
+speciesSilver:prop_s_plot:regionCentre   21.32753    6.01795 3136.26333   3.544 0.000400 ***
+speciesSilver:prop_s_plot:regionNorth    16.11770    4.97500 3122.20854   3.240 0.001209 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

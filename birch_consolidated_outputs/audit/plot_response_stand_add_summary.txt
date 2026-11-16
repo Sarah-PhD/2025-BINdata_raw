@@ -1,0 +1,42 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 33228.8
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.2905 -0.4756 -0.1531  0.2588  4.8451 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept) 139.62   11.816  
+ area          (Intercept)  59.37    7.705  
+ Residual                  260.82   16.150  
+Number of obs: 3866, groups:  stand_id:area, 491; area, 13
+
+Fixed effects:
+                                Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                     11.04864    2.75691   20.45220   4.008 0.000666 ***
+speciesSilver                    6.68868    0.66564 3474.79088  10.048  < 2e-16 ***
+prop_s_stand                     3.35913    2.41878  441.81053   1.389 0.165601    
+mean_north_c                     1.05646    0.76278   12.72559   1.385 0.189847    
+total_birch_c                    0.08702    0.04341  384.82355   2.005 0.045686 *  
+height_c                        -5.66199    0.53716 1948.04897 -10.541  < 2e-16 ***
+total_cervid_pellets_log_mean    4.43449    0.79417  464.44449   5.584 4.01e-08 ***
+pctPCT                          -4.13755    1.11567 1558.93852  -3.709 0.000216 ***
+year2025                        -3.92599    1.38024  407.82510  -2.844 0.004673 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) spcsSl prp_s_ mn_nr_ ttl_b_ hght_c tt____ pctPCT
+speciesSlvr -0.014                                                 
+prop_s_stnd -0.396 -0.204                                          
+mean_nrth_c -0.068  0.011  0.192                                   
+totl_brch_c -0.085  0.008  0.137  0.003                            
+height_c     0.001 -0.089  0.036  0.053 -0.086                     
+ttl_crvd___ -0.280 -0.018 -0.093 -0.023  0.046 -0.019              
+pctPCT      -0.056  0.004 -0.036  0.010 -0.050  0.098 -0.021       
+year2025    -0.312 -0.024  0.034 -0.007 -0.054 -0.091  0.266 -0.118

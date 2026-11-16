@@ -1,0 +1,74 @@
+Linear mixed-effects model fit by REML
+  Data: d_var 
+       AIC      BIC    logLik
+  6353.032 6440.378 -3157.516
+
+Random effects:
+ Formula: ~1 | area
+        (Intercept)
+StdDev:    9.157316
+
+ Formula: ~1 | stand_id %in% area
+        (Intercept) Residual
+StdDev:    9.826312 17.29861
+
+Variance function:
+ Structure: Different standard deviations per stratum
+ Formula: ~1 | region 
+ Parameter estimates:
+    South     North    Centre 
+1.0000000 0.7880166 0.5834662 
+Fixed effects:  list(fixed_f) 
+                                                Value Std.Error  DF   t-value p-value
+(Intercept)                                 12.041069  3.207462 468  3.754080  0.0002
+speciesSilver                               10.472239  2.269150 253  4.615050  0.0000
+prop_s_stand                                 8.730721  2.998051 468  2.912132  0.0038
+mean_north_c                                 0.367891  0.905417 468  0.406322  0.6847
+total_birch_c                                0.155349  0.055987 468  2.774745  0.0057
+height_c                                    -1.561230  0.999380 253 -1.562198  0.1195
+total_cervid_pellets_log_mean                4.129110  1.038712 468  3.975223  0.0001
+pctPCT                                      -4.086398  1.599178 468 -2.555312  0.0109
+year2025                                    -5.290277  1.525818 468 -3.467174  0.0006
+speciesSilver:prop_s_stand                  -9.659950  3.623774 253 -2.665715  0.0082
+speciesSilver:mean_north_c                   2.144934  0.453548 253  4.729230  0.0000
+speciesSilver:total_birch_c                 -0.129198  0.078571 253 -1.644350  0.1013
+speciesSilver:height_c                      -0.730278  1.302208 253 -0.560800  0.5754
+speciesSilver:total_cervid_pellets_log_mean  0.508881  1.164102 253  0.437145  0.6624
+ Correlation: 
+                                            (Intr) spcsSl prp_s_ mn_nr_ ttl_b_ hght_c tt____ pctPCT yr2025 spcsSlvr:p__
+speciesSilver                               -0.168                                                                     
+prop_s_stand                                -0.338  0.299                                                              
+mean_north_c                                -0.073  0.026  0.148                                                       
+total_birch_c                               -0.063  0.061  0.094 -0.012                                                
+height_c                                    -0.013  0.153  0.221  0.024 -0.108                                         
+total_cervid_pellets_log_mean               -0.254  0.128 -0.128 -0.072  0.055 -0.056                                  
+pctPCT                                      -0.080  0.050 -0.039  0.021 -0.058  0.091 -0.036                           
+year2025                                    -0.261 -0.108 -0.051 -0.007 -0.033 -0.148  0.222 -0.125                    
+speciesSilver:prop_s_stand                   0.108 -0.766 -0.515 -0.027 -0.040 -0.253  0.112 -0.043  0.117             
+speciesSilver:mean_north_c                   0.104 -0.209 -0.127 -0.257  0.008 -0.079  0.098 -0.032 -0.017  0.217      
+speciesSilver:total_birch_c                  0.015 -0.187 -0.037  0.035 -0.474  0.037 -0.035  0.018 -0.012  0.193      
+speciesSilver:height_c                       0.013 -0.036 -0.131 -0.037  0.080 -0.628  0.029 -0.017  0.085  0.064      
+speciesSilver:total_cervid_pellets_log_mean  0.095 -0.288  0.074  0.061 -0.051  0.014 -0.570  0.000  0.006 -0.153      
+                                            spcsSlvr:m__ spcsSlvr:t__ spcS:_
+speciesSilver                                                               
+prop_s_stand                                                                
+mean_north_c                                                                
+total_birch_c                                                               
+height_c                                                                    
+total_cervid_pellets_log_mean                                               
+pctPCT                                                                      
+year2025                                                                    
+speciesSilver:prop_s_stand                                                  
+speciesSilver:mean_north_c                                                  
+speciesSilver:total_birch_c                 -0.022                          
+speciesSilver:height_c                       0.266       -0.119             
+speciesSilver:total_cervid_pellets_log_mean -0.136        0.051        0.032
+
+Standardized Within-Group Residuals:
+       Min         Q1        Med         Q3        Max 
+-2.0289529 -0.4877746 -0.1159555  0.3250846  3.7360481 
+
+Number of Observations: 747
+Number of Groups: 
+              area stand_id %in% area 
+                13                487 

@@ -1,0 +1,48 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: main_formula
+   Data: df_main
+Control: lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e+05))
+
+REML criterion at convergence: 6339.9
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.0673 -0.5072 -0.1146  0.3484  3.7158 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept)  81.35    9.019  
+ area          (Intercept)  83.55    9.141  
+ Residual                  211.32   14.537  
+Number of obs: 747, groups:  stand_id:area, 487; area, 13
+
+Fixed effects:
+                                             Estimate Std. Error        df t value Pr(>|t|)    
+(Intercept)                                  11.77164    3.23922  19.88030   3.634 0.001665 ** 
+speciesSilver                                12.05476    2.46725 478.74646   4.886 1.41e-06 ***
+prop_s_stand                                 10.43628    3.15002 698.91460   3.313 0.000970 ***
+mean_north_c                                  0.13084    0.90396  15.06084   0.145 0.886832    
+total_birch_c                                 0.19768    0.05705 704.37472   3.465 0.000562 ***
+height_c                                     -2.07350    1.02786 714.71261  -2.017 0.044037 *  
+total_cervid_pellets_log_mean                 4.24906    1.07123 722.97550   3.967 8.02e-05 ***
+pctPCT                                       -4.53778    1.57334 471.11600  -2.884 0.004104 ** 
+year2025                                     -5.18281    1.54074 490.14296  -3.364 0.000829 ***
+speciesSilver:prop_s_stand                  -12.39736    3.89728 502.16762  -3.181 0.001558 ** 
+speciesSilver:mean_north_c                    2.12326    0.43395 363.89872   4.893 1.50e-06 ***
+speciesSilver:total_birch_c                  -0.21549    0.08172 442.94564  -2.637 0.008661 ** 
+speciesSilver:height_c                       -0.71655    1.34475 533.16540  -0.533 0.594358    
+speciesSilver:total_cervid_pellets_log_mean  -0.55948    1.25145 435.41200  -0.447 0.655049    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+ Groups        Name        Std.Dev.
+ stand_id:area (Intercept)  9.0195 
+ area          (Intercept)  9.1406 
+ Residual                  14.5368 
+[1] FALSE
+$opt
+[1] 0
+
+$lme4
+list()
+
+[1] "Residual skewness: 1.22577866930408"

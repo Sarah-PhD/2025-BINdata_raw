@@ -5802,3 +5802,87 @@ summary(m_stand_species_int_cervid)
 r.squaredGLMM(m_stand_species_int_cervid)
 drop1(update(m_stand_species_int_cervid, REML = FALSE), test = "Chisq")
 check_collinearity(m_stand_species_int_cervid)
+
+# Find the available plot-related datasets
+ls(pattern = "birch_plot|df_full_ecology_plot")
+
+# Inspect column names
+names(df_full_ecology_plot)
+
+# Find possible plot identifiers
+grep(
+  "plot|stand|area",
+  names(df_full_ecology_plot),
+  value = TRUE,
+  ignore.case = TRUE
+)
+
+# Check the number of rows
+nrow(df_full_ecology_plot)
+
+# Compare the available datasets
+data.frame(
+  dataset = c(
+    "birch_plot_long_pel_damage",
+    "birch_plot_model",
+    "birch_plot_model_damage",
+    "df_full_ecology_plot"
+  ),
+  rows = c(
+    nrow(birch_plot_long_pel_damage),
+    nrow(birch_plot_model),
+    nrow(birch_plot_model_damage),
+    nrow(df_full_ecology_plot)
+  )
+)
+
+# Look for plot identifiers in the original datasets
+grep(
+  "plot|stand|area",
+  names(birch_plot_long_pel_damage),
+  value = TRUE,
+  ignore.case = TRUE
+)
+
+grep(
+  "plot|stand|area",
+  names(birch_plot_model_damage),
+  value = TRUE,
+  ignore.case = TRUE
+)
+library(dplyr)
+
+df_full_ecology_plot %>%
+  group_by(area, stand_id) %>%
+  summarise(
+    n_rows = n(),
+    n_species = n_distinct(species),
+    .groups = "drop"
+  ) %>%
+  summarise(
+    total_stands = n(),
+    mean_rows_per_stand = mean(n_rows),
+    min_rows = min(n_rows),
+    max_rows = max(n_rows)
+  )
+# Does the original plot identifier still exist?
+names(Birch_2425)[grepl(
+  "plot|point|yta",
+  names(Birch_2425),
+  ignore.case = TRUE
+)]
+
+# Check plot numbers within stands
+Birch_2425 %>%
+  group_by(year, area, stand_number) %>%
+  summarise(
+    n_rows = n(),
+    n_plots = n_distinct(plot),
+    .groups = "drop"
+  ) %>%
+  summarise(
+    stands = n(),
+    min_plots = min(n_plots),
+    max_plots = max(n_plots),
+    mean_plots = mean(n_plots)
+  )

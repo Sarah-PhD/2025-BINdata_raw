@@ -1,0 +1,9 @@
+damage_N ~ species * (prop_s_stand + mean_north_c + total_birch_c + 
+    height_c + total_cervid_pellets_log_mean) + pct + year + 
+    (1 | area/stand_id)
+[1] 747
+[1] 14.53681
+ Groups        Name        Std.Dev.
+ stand_id:area (Intercept)  9.0195 
+ area          (Intercept)  9.1406 
+ Residual                  14.5368 

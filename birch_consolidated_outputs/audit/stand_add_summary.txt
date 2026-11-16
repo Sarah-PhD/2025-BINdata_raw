@@ -1,0 +1,42 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 6397.1
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.2711 -0.5127 -0.1583  0.3197  3.9412 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ stand_id:area (Intercept)  78.51    8.860  
+ area          (Intercept)  75.71    8.701  
+ Residual                  232.08   15.234  
+Number of obs: 747, groups:  stand_id:area, 487; area, 13
+
+Fixed effects:
+                               Estimate Std. Error        df t value Pr(>|t|)    
+(Intercept)                    11.71441    3.09810  19.21949   3.781  0.00124 ** 
+speciesSilver                   5.59183    1.26115 369.27764   4.434 1.22e-05 ***
+prop_s_stand                    5.11761    2.65144 490.86365   1.930  0.05417 .  
+mean_north_c                    1.34138    0.84712  12.78514   1.583  0.13773    
+total_birch_c                   0.13578    0.04992 494.36201   2.720  0.00675 ** 
+height_c                       -3.96485    0.73971 729.67921  -5.360 1.12e-07 ***
+total_cervid_pellets_log_mean   4.07209    0.85257 496.23025   4.776 2.35e-06 ***
+pctPCT                         -4.44417    1.60785 463.45770  -2.764  0.00594 ** 
+year2025                       -3.81295    1.54944 468.28120  -2.461  0.01422 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) spcsSl prp_s_ mn_nr_ ttl_b_ hght_c tt____ pctPCT
+speciesSlvr -0.080                                                 
+prop_s_stnd -0.366 -0.238                                          
+mean_nrth_c -0.059  0.015  0.167                                   
+totl_brch_c -0.077  0.004  0.142  0.006                            
+height_c     0.007 -0.085  0.056  0.057 -0.093                     
+ttl_crvd___ -0.266 -0.047 -0.078 -0.031  0.039 -0.013              
+pctPCT      -0.075  0.028 -0.073  0.014 -0.054  0.107 -0.026       
+year2025    -0.300 -0.028  0.047 -0.010 -0.046 -0.089  0.267 -0.139

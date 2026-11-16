@@ -1,0 +1,43 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: formula
+   Data: data
+Control: lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 33015.5
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.2537 -0.4999 -0.1301  0.2508  4.8219 
+
+Random effects:
+ Groups                Name        Variance Std.Dev.
+ plot_id:stand_id:area (Intercept)   4.42    2.102  
+ stand_id:area         (Intercept) 131.55   11.470  
+ area                  (Intercept)  94.10    9.701  
+ Residual                          252.85   15.901  
+Number of obs: 3853, groups:  plot_id:stand_id:area, 3050; stand_id:area, 489; area, 13
+
+Fixed effects:
+                                         Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                              18.63022    5.52748   14.09901   3.370 0.004534 ** 
+speciesSilver                             1.46518    2.77554 2411.53507   0.528 0.597624    
+prop_s_plot                              14.51371    3.24369 3759.25514   4.474 7.89e-06 ***
+regionCentre                             -0.49431    8.01074   11.57565  -0.062 0.951850    
+regionNorth                              -1.54698    6.81765   11.87597  -0.227 0.824354    
+total_birch_c                             0.03351    0.02063 3679.98116   1.624 0.104357    
+height_c                                 -0.31143    0.36280 3767.27939  -0.858 0.390719    
+total_cervid_pellets_log                  0.69880    0.36778 3779.32528   1.900 0.057503 .  
+pctPCT                                   -3.65465    1.10185 1478.18215  -3.317 0.000933 ***
+year2025                                 -7.42057    1.30516  435.82438  -5.686 2.39e-08 ***
+speciesSilver:prop_s_plot               -17.21459    4.08736 3092.28450  -4.212 2.61e-05 ***
+speciesSilver:regionCentre                3.14433    3.94108 2494.95834   0.798 0.425042    
+speciesSilver:regionNorth                10.99596    3.24408 2519.00671   3.390 0.000711 ***
+prop_s_plot:regionCentre                -13.72106    4.53003 3808.98868  -3.029 0.002471 ** 
+prop_s_plot:regionNorth                 -14.62519    3.82992 3798.83281  -3.819 0.000136 ***
+speciesSilver:total_birch_c              -0.03907    0.03254 2676.05800  -1.201 0.229913    
+speciesSilver:height_c                   -1.14028    0.48966 3412.45835  -2.329 0.019931 *  
+speciesSilver:total_cervid_pellets_log    0.58896    0.46552 2628.89271   1.265 0.205921    
+speciesSilver:prop_s_plot:regionCentre   21.32753    6.01795 3136.26333   3.544 0.000400 ***
+speciesSilver:prop_s_plot:regionNorth    16.11770    4.97500 3122.20854   3.240 0.001209 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

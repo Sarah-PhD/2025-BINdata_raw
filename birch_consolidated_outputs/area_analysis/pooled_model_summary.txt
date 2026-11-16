@@ -1,0 +1,78 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: pooled_formula
+   Data: area_df
+Control: lme4::lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 5912.7
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.7248 -0.4537 -0.0889  0.3033  3.9394 
+
+Random effects:
+ Groups        Name        Variance Std.Dev.
+ area:stand_id (Intercept) 101.8    10.09   
+ Residual                  171.5    13.09   
+Number of obs: 747, groups:  area:stand_id, 487
+
+Fixed effects:
+                                            Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                                2.258e+01  1.656e+01  6.894e+02   1.364  0.17312    
+speciesSilver                             -2.053e+01  1.740e+01  3.216e+02  -1.180  0.23895    
+prop_s_stand                              -1.744e+01  2.394e+01  6.471e+02  -0.729  0.46650    
+areaBarksätter                            -2.379e+01  3.648e+01  6.809e+02  -0.652  0.51460    
+areaFredrika                              -2.099e+01  1.667e+01  6.897e+02  -1.260  0.20825    
+areaFurudal                               -6.039e+00  1.899e+01  6.884e+02  -0.318  0.75062    
+areaLjusdal                               -1.557e+01  1.728e+01  6.893e+02  -0.901  0.36774    
+areaLofsdalen                             -1.015e+01  1.678e+01  6.894e+02  -0.605  0.54554    
+areaLycksele                              -6.128e+00  1.689e+01  6.892e+02  -0.363  0.71693    
+areaMalå                                  -1.121e+01  1.726e+01  6.893e+02  -0.649  0.51643    
+areaNordmaling                            -1.456e+01  1.682e+01  6.894e+02  -0.865  0.38708    
+areaÖsterMalma                            -3.315e+01  1.950e+01  6.900e+02  -1.700  0.08961 .  
+areaRåneå                                 -4.075e-01  1.866e+01  6.880e+02  -0.022  0.98258    
+areaSorsele                                1.981e+00  1.680e+01  6.894e+02   0.118  0.90618    
+areaVäxjö                                 -1.122e+01  1.769e+01  6.895e+02  -0.635  0.52594    
+stem_count_c                               1.944e-04  5.794e-02  6.794e+02   0.003  0.99732    
+height_c                                  -1.472e+00  7.701e-01  6.668e+02  -1.912  0.05630 .  
+total_cervid_pellets_log_mean              3.705e+00  8.480e-01  4.753e+02   4.370 1.53e-05 ***
+pctPCT                                    -3.654e+00  1.623e+00  4.481e+02  -2.251  0.02486 *  
+year2025                                  -5.137e+00  1.571e+00  4.504e+02  -3.270  0.00116 ** 
+speciesSilver:prop_s_stand                 2.710e+01  2.483e+01  3.974e+02   1.091  0.27580    
+speciesSilver:areaBarksätter               8.418e+01  3.994e+01  2.975e+02   2.108  0.03589 *  
+speciesSilver:areaFredrika                 3.449e+01  1.824e+01  3.337e+02   1.891  0.05946 .  
+speciesSilver:areaFurudal                  5.652e+01  2.227e+01  4.048e+02   2.538  0.01153 *  
+speciesSilver:areaLjusdal                  2.450e+01  1.893e+01  3.297e+02   1.294  0.19655    
+speciesSilver:areaLofsdalen                3.542e+01  2.271e+01  3.877e+02   1.560  0.11959    
+speciesSilver:areaLycksele                 4.261e+01  1.894e+01  3.375e+02   2.249  0.02513 *  
+speciesSilver:areaMalå                     1.503e+01  1.945e+01  3.415e+02   0.773  0.44028    
+speciesSilver:areaNordmaling               3.007e+01  1.852e+01  3.309e+02   1.624  0.10537    
+speciesSilver:areaÖsterMalma               3.065e+01  2.100e+01  3.208e+02   1.460  0.14532    
+speciesSilver:areaRåneå                    3.862e+01  2.096e+01  3.311e+02   1.842  0.06630 .  
+speciesSilver:areaSorsele                  4.078e+01  1.936e+01  3.430e+02   2.106  0.03589 *  
+speciesSilver:areaVäxjö                    2.786e+01  1.890e+01  3.167e+02   1.474  0.14147    
+prop_s_stand:areaBarksätter                1.044e+02  4.977e+01  6.782e+02   2.097  0.03632 *  
+prop_s_stand:areaFredrika                  4.235e+01  2.621e+01  6.596e+02   1.616  0.10665    
+prop_s_stand:areaFurudal                   4.518e+01  3.070e+01  6.677e+02   1.471  0.14163    
+prop_s_stand:areaLjusdal                   1.635e+01  2.589e+01  6.615e+02   0.632  0.52792    
+prop_s_stand:areaLofsdalen                 1.639e+00  2.767e+01  6.810e+02   0.059  0.95279    
+prop_s_stand:areaLycksele                  1.917e+01  2.575e+01  6.664e+02   0.744  0.45686    
+prop_s_stand:areaMalå                      1.243e+01  3.057e+01  6.671e+02   0.407  0.68441    
+prop_s_stand:areaNordmaling                2.188e+01  2.568e+01  6.674e+02   0.852  0.39457    
+prop_s_stand:areaÖsterMalma                8.673e+01  2.792e+01  6.546e+02   3.106  0.00198 ** 
+prop_s_stand:areaRåneå                    -3.679e+00  2.795e+01  6.755e+02  -0.132  0.89534    
+prop_s_stand:areaSorsele                   4.170e+01  2.715e+01  6.767e+02   1.536  0.12506    
+prop_s_stand:areaVäxjö                     2.054e+01  2.688e+01  6.626e+02   0.764  0.44504    
+speciesSilver:prop_s_stand:areaBarksätter -1.647e+02  5.296e+01  3.630e+02  -3.110  0.00202 ** 
+speciesSilver:prop_s_stand:areaFredrika   -3.953e+01  2.821e+01  4.195e+02  -1.401  0.16184    
+speciesSilver:prop_s_stand:areaFurudal    -6.314e+01  3.425e+01  5.241e+02  -1.843  0.06586 .  
+speciesSilver:prop_s_stand:areaLjusdal    -2.516e+01  2.784e+01  3.958e+02  -0.904  0.36659    
+speciesSilver:prop_s_stand:areaLofsdalen  -2.965e+01  4.095e+01  4.305e+02  -0.724  0.46949    
+speciesSilver:prop_s_stand:areaLycksele   -4.731e+01  2.869e+01  4.030e+02  -1.649  0.09998 .  
+speciesSilver:prop_s_stand:areaMalå        1.177e+01  3.364e+01  4.187e+02   0.350  0.72654    
+speciesSilver:prop_s_stand:areaNordmaling -2.660e+01  2.866e+01  3.921e+02  -0.928  0.35391    
+speciesSilver:prop_s_stand:areaÖsterMalma -8.409e+01  2.917e+01  3.918e+02  -2.882  0.00416 ** 
+speciesSilver:prop_s_stand:areaRåneå      -3.097e+01  3.069e+01  3.839e+02  -1.009  0.31362    
+speciesSilver:prop_s_stand:areaSorsele    -6.034e+01  3.288e+01  3.927e+02  -1.835  0.06727 .  
+speciesSilver:prop_s_stand:areaVäxjö      -3.373e+01  2.807e+01  3.814e+02  -1.202  0.23012    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

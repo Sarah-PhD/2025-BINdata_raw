@@ -1,0 +1,41 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: update(f, . ~ . + (1 | stand_id))
+   Data: dat
+Control: lme4::lmerControl(optimizer = "bobyqa")
+
+REML criterion at convergence: 541.6
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-1.3388 -0.4313 -0.0592  0.2119  3.5414 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ stand_id (Intercept)  70.55    8.399  
+ Residual             235.22   15.337  
+Number of obs: 69, groups:  stand_id, 44
+
+Fixed effects:
+                              Estimate Std. Error       df t value Pr(>|t|)   
+(Intercept)                    10.3194     5.2728  53.4970   1.957  0.05556 . 
+speciesSilver                   8.2957     8.5957  57.5980   0.965  0.33853   
+prop_s_stand                    4.4594    11.2235  57.3894   0.397  0.69260   
+stem_count_c                   -0.1306     0.1715  55.9485  -0.761  0.44962   
+height_c                        1.1441     3.8317  54.4911   0.299  0.76639   
+total_cervid_pellets_log_mean   0.9673     3.7561  47.9664   0.258  0.79787   
+pctPCT                          2.1839     5.5751  43.3364   0.392  0.69718   
+year2025                      -13.3164     4.9164  40.3098  -2.709  0.00987 **
+speciesSilver:prop_s_stand      3.9528    18.6895  54.6521   0.211  0.83328   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:
+            (Intr) spcsSl prp_s_ stm_c_ hght_c tt____ pctPCT yr2025
+speciesSlvr -0.572                                                 
+prop_s_stnd -0.663  0.455                                          
+stem_cont_c -0.481  0.435  0.346                                   
+height_c    -0.274  0.234  0.268 -0.213                            
+ttl_crvd___ -0.007 -0.039 -0.254  0.110 -0.442                     
+pctPCT      -0.325  0.142  0.094  0.062  0.334 -0.295              
+year2025    -0.220 -0.056 -0.113  0.094 -0.245  0.187 -0.142       
+spcsSlvr:__  0.503 -0.870 -0.559 -0.388 -0.203  0.022 -0.115  0.015

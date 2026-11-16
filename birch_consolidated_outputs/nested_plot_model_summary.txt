@@ -1,0 +1,49 @@
+Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Formula: plot_formula
+   Data: plot_model
+Control: lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e+05))
+
+REML criterion at convergence: 32781
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.3132 -0.4699 -0.1350  0.2323  4.7902 
+
+Random effects:
+ Groups                Name        Variance Std.Dev.
+ plot_id:stand_id:area (Intercept)   8.637   2.939  
+ stand_id:area         (Intercept) 127.074  11.273  
+ area                  (Intercept)  66.023   8.125  
+ Residual                          246.924  15.714  
+Number of obs: 3827, groups:  plot_id:stand_id:area, 3026; stand_id:area, 485; area, 13
+
+Fixed effects:
+                                              Estimate Std. Error         df t value Pr(>|t|)    
+(Intercept)                                   12.31329    2.84442   20.08540   4.329 0.000323 ***
+speciesSilver                                 10.64918    1.54816 2593.17501   6.879 7.55e-12 ***
+prop_s_stand                                   6.52343    2.60685  634.47953   2.502 0.012585 *  
+mean_north_c                                   0.03065    0.80072   13.80723   0.038 0.970009    
+total_birch_c                                  0.12397    0.04394  450.43524   2.821 0.004998 ** 
+height_c                                      -3.33327    0.69272 1642.61882  -4.812 1.63e-06 ***
+total_cervid_pellets_log_mean                  4.32297    0.86664  694.13391   4.988 7.71e-07 ***
+pctPCT                                        -5.61335    1.40770  410.77390  -3.988 7.90e-05 ***
+year2025                                      -4.85419    1.35411  411.33525  -3.585 0.000378 ***
+speciesSilver:prop_s_stand                    -7.32600    2.45523 2606.88506  -2.984 0.002873 ** 
+speciesSilver:mean_north_c                     1.92075    0.23035 2209.04723   8.338  < 2e-16 ***
+speciesSilver:total_birch_c                   -0.16357    0.04822 2324.02141  -3.392 0.000705 ***
+speciesSilver:height_c                        -1.42936    0.77235 2384.60182  -1.851 0.064342 .  
+speciesSilver:total_cervid_pellets_log_mean   -0.02412    0.73409 2384.24660  -0.033 0.973795    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+ Groups                Name        Std.Dev.
+ plot_id:stand_id:area (Intercept)  2.9389 
+ stand_id:area         (Intercept) 11.2727 
+ area                  (Intercept)  8.1255 
+ Residual                          15.7138 
+[1] FALSE
+$opt
+[1] 0
+
+$lme4
+list()
+
