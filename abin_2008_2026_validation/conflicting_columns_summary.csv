@@ -1,0 +1,7 @@
+variable,total_rows,both_present,conflicting_rows,only_first_present,only_second_present
+rowan_damaged,22359,4,4,2269,156
+aspen_damaged,22359,36,36,1472,124
+salix_damaged,22359,14,14,2265,146
+oak_damaged,22359,2,2,496,158
+pine_od,22359,72,47,5133,113
+pine_o,22359,5,1,629,48

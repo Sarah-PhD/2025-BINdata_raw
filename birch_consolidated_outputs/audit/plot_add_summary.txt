@@ -1,4 +1,5 @@
-Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
 Formula: formula
    Data: data
 Control: lmerControl(optimizer = "bobyqa")
@@ -15,7 +16,8 @@ Random effects:
  stand_id:area         (Intercept) 1.351e+02 1.162e+01
  area                  (Intercept) 8.391e+01 9.160e+00
  Residual                          2.697e+02 1.642e+01
-Number of obs: 3853, groups:  plot_id:stand_id:area, 3050; stand_id:area, 489; area, 13
+Number of obs: 3853, groups:  
+plot_id:stand_id:area, 3050; stand_id:area, 489; area, 13
 
 Fixed effects:
                            Estimate Std. Error         df t value Pr(>|t|)    

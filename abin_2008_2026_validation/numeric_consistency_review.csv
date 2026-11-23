@@ -1,0 +1,50 @@
+column,nonnumeric_values,example_values
+half_height,49,NA
+pine_ub,2,NA
+pine_damaged,2,NA
+rowan_height,80,N/A
+aspen_height,187,Rutan ligger ca 300m S om punkt 12. | Kanske väl gammalt bestånd. Såg bra ut i början men dsedan blev det allt större. | Lärk hårt betat. | I detta protokoll finns bara EN mäthöjd!! | Endast EN mäthöjd angven!!
+salix_height,78,N/A
+oak_height,354,FALSE | TRUE | N/A
+downy_fb,1,TRUE
+rowan_damaged,438,NA | N/A | 26_50 | ≤10 | 11_25
+aspen_damaged,462,N/A | ≤10 | 11_25 | ol | 26_50
+salix_damaged,531,N/A | ≤10 | 11_25 | 51_75 | 26_50
+oak_damaged,428,TRUE | FALSE | N/A | ol | 76_100
+average_height_m,1910,1-4 m
+"pine_fb,ps",3,TRUE
+"downy_fb,od",2,TRUE
+"silver_fs,ps",1,TRUE
+pine_browsed_<_hh,6,Knäckesjuka. | Planterat. Alla Råneå var självsådda. | Contorta | Döende toppar - ligger på marken och betat | Något döda tallarna / mycket döda toppar
+rowan_damaged...dup1,160,N/A
+rowan_undamaged,160,N/A
+aspen_damaged...dup1,160,N/A
+aspen_undamaged,160,N/A
+salix_damaged...dup1,160,N/A
+salix_undamaged,160,N/A
+oak_damaged...dup1,160,N/A
+oak_undamaged,160,N/A
+"pine_fb,fts,ss",1,TRUE
+"pine_fb,od,ps",1,TRUE
+"pine_fb,ps,ss",1,TRUE
+"pine_fb,ss",6,TRUE
+"pine_od,ps,ss",8,TRUE
+"pine_ps,ss",2,TRUE
+contorta_browsed_<_hh,24,TRUE | FALSE
+contorta_contorta,1689,no | yes
+contorta_fb,3,TRUE
+"contorta_fb,od",1,FALSE
+"contorta_fs,od",1,TRUE
+contorta_fts,1,TRUE
+"contorta_fts,ss",7,TRUE
+contorta_o,5,TRUE
+contorta_ss,5,TRUE
+larch_fresh_stem_breakage_+_old_damage,1,TRUE
+larch_stems_<_hh,3,TRUE
+downy_damage,1573,11_25 | ≤10 | 26_50 | 51_75 | ol
+silver_damage,2091,ol | 26_50 | ≤10 | 11_25 | 76_100
+aspen_damage,472,≤10 | 11_25 | 76_100 | 51_75 | 26_50
+oak_damage,60,11_25 | 76_100 | 51_75 | 26_50 | ≤10
+rowan_damage,371,76_100 | 11_25 | ≤10 | 51_75 | 26_50
+salix_damage,429,11_25 | 51_75 | 26_50 | ≤10 | 76_100
+Contorta,3601,no | yes

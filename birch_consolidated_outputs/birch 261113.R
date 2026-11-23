@@ -2016,3 +2016,2352 @@ height_slopes <- lapply(
 )
 
 names(height_slopes) <- names(regional_models)
+
+model <- models$stand_int
+
+plot(
+  fitted(model),
+  resid(model),
+  xlab = "Fitted browsing damage (%)",
+  ylab = "Residuals"
+)
+
+abline(h = 0, col = "red")
+boxplot(
+  resid(model) ~ model.frame(model)$species,
+  xlab = "Birch species",
+  ylab = "Residuals"
+)
+
+
+
+# ============================================================
+# HETEROSCEDASTICITY ANALYSIS
+# National model: varIdent by species
+# Downy model: varPower
+# Silver model: varPower
+#
+# Compare BEFORE vs AFTER:
+#  - AIC
+#  - residual diagnostics
+#  - residual variance patterns
+#  - coefficients, SE and p-values
+#
+# Uses existing models:
+# models$stand_int
+# models$stand_downy
+# models$stand_silver
+# ============================================================
+
+
+# ------------------------------------------------------------
+# 1. PACKAGES
+# ------------------------------------------------------------
+
+packages <- c(
+  "lme4",
+  "lmerTest",
+  "nlme",
+  "ggplot2",
+  "dplyr"
+)
+
+for (p in packages) {
+  if (!requireNamespace(p, quietly = TRUE)) {
+    install.packages(p)
+  }
+}
+
+library(lme4)
+library(lmerTest)
+library(ggplot2)
+library(dplyr)
+
+# Use nlme:: explicitly to avoid lme4/nlme conflicts
+
+
+# ------------------------------------------------------------
+# 2. ORIGINAL MODELS
+# ------------------------------------------------------------
+
+m_main_original   <- models$stand_int
+m_downy_original  <- models$stand_downy
+m_silver_original <- models$stand_silver
+
+# Extract exactly the observations used in each model
+
+df_main <- as.data.frame(model.frame(m_main_original))
+df_downy <- as.data.frame(model.frame(m_downy_original))
+df_silver <- as.data.frame(model.frame(m_silver_original))
+
+# Check model structures
+
+cat("\nMAIN MODEL:\n")
+print(formula(m_main_original))
+
+cat("\nDOWNY MODEL:\n")
+print(formula(m_downy_original))
+
+cat("\nSILVER MODEL:\n")
+print(formula(m_silver_original))
+
+
+# ------------------------------------------------------------
+# 3. PREPARE DATA AND FORMULAS
+# ------------------------------------------------------------
+
+# Extract fixed-effect formulas from original models
+
+f_main <- lme4::nobars(formula(m_main_original))
+f_downy <- lme4::nobars(formula(m_downy_original))
+f_silver <- lme4::nobars(formula(m_silver_original))
+
+# Preserve the original species factor
+df_main$species <- factor(df_main$species)
+
+# Create a unique stand identifier nested within area
+# This prevents duplicate stand IDs in different areas
+
+df_main$stand_nested <- interaction(
+  df_main$area,
+  df_main$stand_id,
+  drop = TRUE
+)
+
+# Variance covariates for species-specific models:
+# Shift fitted values to be strictly positive.
+#
+# This is fixed from the original models, rather than
+# updated during optimisation.
+#
+# It avoids a singularity at fitted value = 0.
+
+make_var_covariate <- function(data, original_model) {
+  
+  fitted_original <- as.numeric(fitted(original_model))
+  
+  data$variance_cov <- (
+    fitted_original -
+      min(fitted_original) +
+      1
+  )
+  
+  return(data)
+}
+
+df_downy <- make_var_covariate(
+  df_downy,
+  m_downy_original
+)
+
+df_silver <- make_var_covariate(
+  df_silver,
+  m_silver_original
+)
+
+
+# ------------------------------------------------------------
+# 4. FIT ORIGINAL VARIANCE STRUCTURES USING NLME
+# ------------------------------------------------------------
+# Refit all models using nlme so comparisons are
+# between models fitted with the same software.
+#
+# ML is used for comparing variance structures.
+# Fixed effects remain identical within each pair.
+
+control_settings <- nlme::lmeControl(
+  opt = "optim",
+  maxIter = 200,
+  msMaxIter = 200,
+  niterEM = 50,
+  returnObject = TRUE
+)
+
+
+# MAIN: area / stand nested random intercepts
+
+m_main_equal <- nlme::lme(
+  fixed = f_main,
+  random = ~ 1 | area/stand_nested,
+  data = df_main,
+  method = "ML",
+  control = control_settings,
+  na.action = na.fail
+)
+
+
+# DOWNY: area random intercept
+
+m_downy_equal <- nlme::lme(
+  fixed = f_downy,
+  random = ~ 1 | area,
+  data = df_downy,
+  method = "ML",
+  control = control_settings,
+  na.action = na.fail
+)
+
+
+# SILVER: area random intercept
+
+m_silver_equal <- nlme::lme(
+  fixed = f_silver,
+  random = ~ 1 | area,
+  data = df_silver,
+  method = "ML",
+  control = control_settings,
+  na.action = na.fail
+)
+
+
+# ------------------------------------------------------------
+# 5. FIT HETEROSCEDASTICITY-CORRECTED MODELS
+# ------------------------------------------------------------
+
+# ============================================================
+# FIX: FIT VARIANCE-CORRECTED MODELS DIRECTLY
+# ============================================================
+
+library(nlme)
+
+# 1. NATIONAL MODEL: varIdent
+m_main_varIdent <- nlme::lme(
+  fixed = f_main,
+  random = ~ 1 | area/stand_nested,
+  weights = nlme::varIdent(
+    form = ~ 1 | species
+  ),
+  data = df_main,
+  method = "ML",
+  control = control_settings,
+  na.action = na.fail
+)
+
+# 2. DOWNY BIRCH: varPower
+m_downy_varPower <- nlme::lme(
+  fixed = f_downy,
+  random = ~ 1 | area,
+  weights = nlme::varPower(
+    form = ~ variance_cov
+  ),
+  data = df_downy,
+  method = "ML",
+  control = control_settings,
+  na.action = na.fail
+)
+
+# 3. SILVER BIRCH: varPower
+m_silver_varPower <- nlme::lme(
+  fixed = f_silver,
+  random = ~ 1 | area,
+  weights = nlme::varPower(
+    form = ~ variance_cov
+  ),
+  data = df_silver,
+  method = "ML",
+  control = control_settings,
+  na.action = na.fail
+)
+
+# Check that all three models were created
+summary(m_main_varIdent)
+summary(m_downy_varPower)
+summary(m_silver_varPower)
+
+
+# ------------------------------------------------------------
+# 6. MODEL COMPARISON
+# ------------------------------------------------------------
+
+cat("\n====================================\n")
+cat("MAIN MODEL: EQUAL vs varIdent\n")
+cat("====================================\n")
+
+print(anova(
+  m_main_equal,
+  m_main_varIdent
+))
+
+
+cat("\n====================================\n")
+cat("DOWNY: EQUAL vs varPower\n")
+cat("====================================\n")
+
+print(anova(
+  m_downy_equal,
+  m_downy_varPower
+))
+
+
+cat("\n====================================\n")
+cat("SILVER: EQUAL vs varPower\n")
+cat("====================================\n")
+
+print(anova(
+  m_silver_equal,
+  m_silver_varPower
+))
+
+
+# ------------------------------------------------------------
+# 7. AIC COMPARISON
+# ------------------------------------------------------------
+
+aic_results <- data.frame(
+  Model = c(
+    "Main equal",
+    "Main varIdent",
+    "Downy equal",
+    "Downy varPower",
+    "Silver equal",
+    "Silver varPower"
+  ),
+  
+  AIC = c(
+    AIC(m_main_equal),
+    AIC(m_main_varIdent),
+    AIC(m_downy_equal),
+    AIC(m_downy_varPower),
+    AIC(m_silver_equal),
+    AIC(m_silver_varPower)
+  )
+)
+
+print(aic_results)
+
+
+# ------------------------------------------------------------
+# 8. RESIDUAL DIAGNOSTIC FUNCTION
+# ------------------------------------------------------------
+
+# Pearson residuals standardise by the fitted
+# residual SD, including the variance function.
+#
+# For corrected models, Pearson residuals are the
+# appropriate diagnostic scale for checking whether
+# the variance function has improved heteroscedasticity.
+
+make_diagnostics <- function(model, model_name) {
+  
+  data.frame(
+    fitted = as.numeric(
+      fitted(model, level = 0)
+    ),
+    
+    residual = as.numeric(
+      resid(model, type = "response")
+    ),
+    
+    pearson_residual = as.numeric(
+      resid(model, type = "pearson")
+    ),
+    
+    model = model_name
+  )
+}
+
+
+# ------------------------------------------------------------
+# 9. COMBINE DIAGNOSTICS
+# ------------------------------------------------------------
+
+diag_main <- bind_rows(
+  make_diagnostics(
+    m_main_equal,
+    "Before: Equal variance"
+  ),
+  make_diagnostics(
+    m_main_varIdent,
+    "After: varIdent"
+  )
+)
+
+diag_downy <- bind_rows(
+  make_diagnostics(
+    m_downy_equal,
+    "Before: Equal variance"
+  ),
+  make_diagnostics(
+    m_downy_varPower,
+    "After: varPower"
+  )
+)
+
+diag_silver <- bind_rows(
+  make_diagnostics(
+    m_silver_equal,
+    "Before: Equal variance"
+  ),
+  make_diagnostics(
+    m_silver_varPower,
+    "After: varPower"
+  )
+)
+
+
+# ------------------------------------------------------------
+# 10. PLOT FUNCTION: BEFORE vs AFTER
+# ------------------------------------------------------------
+
+plot_diagnostics <- function(data, title) {
+  
+  ggplot(
+    data,
+    aes(
+      x = fitted,
+      y = pearson_residual
+    )
+  ) +
+    
+    geom_point(
+      alpha = 0.4,
+      size = 1.5
+    ) +
+    
+    geom_hline(
+      yintercept = 0,
+      colour = "red"
+    ) +
+    
+    facet_wrap(
+      ~ model,
+      scales = "fixed"
+    ) +
+    
+    labs(
+      title = title,
+      x = "Fitted browsing damage (%)",
+      y = "Pearson residuals"
+    ) +
+    
+    theme_classic(base_size = 13)
+}
+
+
+# NATIONAL
+
+p_main <- plot_diagnostics(
+  diag_main,
+  "National model: Before vs varIdent"
+)
+
+print(p_main)
+
+
+# DOWNY
+
+p_downy <- plot_diagnostics(
+  diag_downy,
+  "Downy birch: Before vs varPower"
+)
+
+print(p_downy)
+
+
+# SILVER
+
+p_silver <- plot_diagnostics(
+  diag_silver,
+  "Silver birch: Before vs varPower"
+)
+
+print(p_silver)
+
+
+# ------------------------------------------------------------
+# 11. RESIDUAL SPREAD ACROSS FITTED VALUES
+# ------------------------------------------------------------
+
+# This checks whether residual variability increases
+# across the fitted-value range.
+#
+# Each model is divided into fitted-value quartiles.
+# We calculate the SD of Pearson residuals in each.
+#
+# An improved model should generally show more similar
+# residual SDs across quartiles.
+
+check_residual_spread <- function(data) {
+  
+  data %>%
+    group_by(model) %>%
+    mutate(
+      fitted_group = ntile(fitted, 4)
+    ) %>%
+    group_by(model, fitted_group) %>%
+    summarise(
+      n = n(),
+      residual_SD = sd(
+        pearson_residual,
+        na.rm = TRUE
+      ),
+      .groups = "drop"
+    )
+}
+
+
+cat("\nMAIN RESIDUAL SPREAD:\n")
+print(check_residual_spread(diag_main))
+
+cat("\nDOWNY RESIDUAL SPREAD:\n")
+print(check_residual_spread(diag_downy))
+
+cat("\nSILVER RESIDUAL SPREAD:\n")
+print(check_residual_spread(diag_silver))
+
+
+# ------------------------------------------------------------
+# 12. VISUALISE RESIDUAL SPREAD
+# ------------------------------------------------------------
+
+plot_spread <- function(data, title) {
+  
+  spread_data <- check_residual_spread(data)
+  
+  ggplot(
+    spread_data,
+    aes(
+      x = fitted_group,
+      y = residual_SD,
+      colour = model,
+      group = model
+    )
+  ) +
+    
+    geom_line(linewidth = 1) +
+    geom_point(size = 3) +
+    
+    scale_x_continuous(
+      breaks = 1:4
+    ) +
+    
+    labs(
+      title = title,
+      x = "Fitted-value quartile",
+      y = "SD of Pearson residuals",
+      colour = "Model"
+    ) +
+    
+    theme_classic(base_size = 13)
+}
+
+
+print(plot_spread(
+  diag_main,
+  "National model: Residual variance"
+))
+
+print(plot_spread(
+  diag_downy,
+  "Downy birch: Residual variance"
+))
+
+print(plot_spread(
+  diag_silver,
+  "Silver birch: Residual variance"
+))
+
+
+# ------------------------------------------------------------
+# 13. COMPARE FIXED EFFECTS BEFORE vs AFTER
+# ------------------------------------------------------------
+
+extract_coefficients <- function(model, name) {
+  
+  result <- as.data.frame(
+    summary(model)$tTable
+  )
+  
+  result$Predictor <- rownames(result)
+  result$Model <- name
+  
+  rownames(result) <- NULL
+  
+  result %>%
+    select(
+      Model,
+      Predictor,
+      Value,
+      Std.Error,
+      `t-value`,
+      `p-value`
+    )
+}
+
+
+# NATIONAL
+
+coef_main <- bind_rows(
+  extract_coefficients(
+    m_main_equal,
+    "Equal variance"
+  ),
+  extract_coefficients(
+    m_main_varIdent,
+    "varIdent"
+  )
+)
+
+cat("\nMAIN COEFFICIENTS:\n")
+print(coef_main)
+
+
+# DOWNY
+
+coef_downy <- bind_rows(
+  extract_coefficients(
+    m_downy_equal,
+    "Equal variance"
+  ),
+  extract_coefficients(
+    m_downy_varPower,
+    "varPower"
+  )
+)
+
+cat("\nDOWNY COEFFICIENTS:\n")
+print(coef_downy)
+
+
+# SILVER
+
+coef_silver <- bind_rows(
+  extract_coefficients(
+    m_silver_equal,
+    "Equal variance"
+  ),
+  extract_coefficients(
+    m_silver_varPower,
+    "varPower"
+  )
+)
+
+cat("\nSILVER COEFFICIENTS:\n")
+print(coef_silver)
+
+
+# ------------------------------------------------------------
+# 14. EXAMINE ESTIMATED VARIANCE FUNCTIONS
+# ------------------------------------------------------------
+
+cat("\nMAIN: varIdent coefficients\n")
+
+print(
+  coef(
+    m_main_varIdent$modelStruct$varStruct,
+    unconstrained = FALSE
+  )
+)
+
+
+cat("\nDOWNY: varPower coefficient\n")
+
+print(
+  coef(
+    m_downy_varPower$modelStruct$varStruct,
+    unconstrained = FALSE
+  )
+)
+
+
+cat("\nSILVER: varPower coefficient\n")
+
+print(
+  coef(
+    m_silver_varPower$modelStruct$varStruct,
+    unconstrained = FALSE
+  )
+)
+
+
+# ------------------------------------------------------------
+# 15. SAVE RESULTS
+# ------------------------------------------------------------
+
+write.csv(
+  aic_results,
+  "heteroscedasticity_AIC.csv",
+  row.names = FALSE
+)
+
+write.csv(
+  coef_main,
+  "heteroscedasticity_main_coefficients.csv",
+  row.names = FALSE
+)
+
+write.csv(
+  coef_downy,
+  "heteroscedasticity_downy_coefficients.csv",
+  row.names = FALSE
+)
+
+write.csv(
+  coef_silver,
+  "heteroscedasticity_silver_coefficients.csv",
+  row.names = FALSE
+)
+
+ggsave(
+  "heteroscedasticity_main.png",
+  p_main,
+  width = 10,
+  height = 5,
+  dpi = 300
+)
+
+ggsave(
+  "heteroscedasticity_downy.png",
+  p_downy,
+  width = 10,
+  height = 5,
+  dpi = 300
+)
+
+ggsave(
+  "heteroscedasticity_silver.png",
+  p_silver,
+  width = 10,
+  height = 5,
+  dpi = 300
+)
+
+
+cat("\n====================================\n")
+cat("HETEROSCEDASTICITY ANALYSIS COMPLETE\n")
+cat("====================================\n")
+
+
+
+# ============================================================
+# ZERO-DAMAGE SENSITIVITY ANALYSIS
+#
+# Stand and plot levels
+# National, Downy and Silver models
+#
+# Original data (including zeros)
+# versus positive-damage observations only
+# ============================================================
+
+# 1. PACKAGES -----------------------------------------------
+
+library(lme4)
+library(lmerTest)
+library(ggplot2)
+library(dplyr)
+
+# 2. SELECT ORIGINAL MODELS ---------------------------------
+
+original_models <- list(
+  stand_national = models$stand_int,
+  stand_downy    = models$stand_downy,
+  stand_silver   = models$stand_silver,
+  plot_national  = models$plot_int,
+  plot_downy     = models$plot_downy,
+  plot_silver    = models$plot_silver
+)
+
+# 3. FIT POSITIVE-ONLY MODELS -------------------------------
+
+positive_models <- list()
+sample_summary <- list()
+
+for (model_name in names(original_models)) {
+  
+  cat("\n====================================\n")
+  cat("MODEL:", model_name, "\n")
+  cat("====================================\n")
+  
+  original <- original_models[[model_name]]
+  
+  # Extract observations actually used by the model
+  df <- as.data.frame(model.frame(original))
+  
+  # Count observations
+  n_total <- nrow(df)
+  n_zero <- sum(df$damage_N == 0, na.rm = TRUE)
+  
+  # Exclude zeros
+  df_positive <- df %>%
+    filter(damage_N > 0) %>%
+    droplevels()
+  
+  n_positive <- nrow(df_positive)
+  
+  cat("Original observations:", n_total, "\n")
+  cat("Zero observations:", n_zero, "\n")
+  cat("Positive observations:", n_positive, "\n")
+  cat("Percentage excluded:",
+      round(100 * n_zero / n_total, 2), "%\n")
+  
+  sample_summary[[model_name]] <- data.frame(
+    model = model_name,
+    original_n = n_total,
+    zero_n = n_zero,
+    positive_n = n_positive,
+    excluded_percent = 100 * n_zero / n_total
+  )
+  
+  # Fit identical model using positive observations
+  positive_models[[model_name]] <- lmerTest::lmer(
+    formula = formula(original),
+    data = df_positive,
+    REML = TRUE,
+    control = lme4::lmerControl(
+      optimizer = "bobyqa"
+    )
+  )
+  
+  cat("\nPositive-only model summary:\n")
+  print(summary(positive_models[[model_name]]))
+}
+
+# 4. SAMPLE SIZE SUMMARY ------------------------------------
+
+sample_results <- bind_rows(sample_summary)
+
+print(sample_results)
+
+# 5. DIAGNOSTIC DATA ----------------------------------------
+
+make_diag <- function(model, model_name, dataset) {
+  
+  data.frame(
+    fitted = as.numeric(fitted(model)),
+    residual = as.numeric(resid(model)),
+    standardised_residual =
+      as.numeric(scale(resid(model))),
+    model = model_name,
+    dataset = dataset
+  )
+}
+
+diagnostic_data <- list()
+
+for (model_name in names(original_models)) {
+  
+  diagnostic_data[[model_name]] <- bind_rows(
+    make_diag(
+      original_models[[model_name]],
+      model_name,
+      "Original (including zeros)"
+    ),
+    make_diag(
+      positive_models[[model_name]],
+      model_name,
+      "Positive damage only"
+    )
+  )
+}
+
+# 6. RESIDUAL PLOTS -----------------------------------------
+
+diagnostic_plots <- list()
+
+for (model_name in names(diagnostic_data)) {
+  
+  p <- ggplot(
+    diagnostic_data[[model_name]],
+    aes(x = fitted, y = standardised_residual)
+  ) +
+    geom_point(alpha = 0.4, size = 1.4) +
+    geom_hline(
+      yintercept = 0,
+      colour = "red"
+    ) +
+    facet_wrap(~ dataset, scales = "fixed") +
+    labs(
+      title = paste("Residual diagnostics:", model_name),
+      x = "Fitted browsing severity (%)",
+      y = "Standardised residuals"
+    ) +
+    theme_classic(base_size = 12)
+  
+  diagnostic_plots[[model_name]] <- p
+  
+  print(p)
+}
+
+# 7. RESIDUAL SPREAD BY FITTED QUARTILE ----------------------
+
+residual_spread <- bind_rows(diagnostic_data) %>%
+  group_by(model, dataset) %>%
+  mutate(
+    fitted_quartile = ntile(fitted, 4)
+  ) %>%
+  group_by(model, dataset, fitted_quartile) %>%
+  summarise(
+    n = n(),
+    residual_SD = sd(
+      standardised_residual,
+      na.rm = TRUE
+    ),
+    .groups = "drop"
+  )
+
+print(residual_spread, n = Inf)
+
+# 8. RESIDUAL SPREAD PLOTS ----------------------------------
+
+for (model_name in names(original_models)) {
+  
+  p <- residual_spread %>%
+    filter(model == model_name) %>%
+    ggplot(
+      aes(
+        x = fitted_quartile,
+        y = residual_SD,
+        colour = dataset,
+        group = dataset
+      )
+    ) +
+    geom_line(linewidth = 1) +
+    geom_point(size = 2.5) +
+    scale_x_continuous(breaks = 1:4) +
+    labs(
+      title = paste("Residual spread:", model_name),
+      x = "Fitted-value quartile",
+      y = "SD of standardised residuals"
+    ) +
+    theme_classic(base_size = 12)
+  
+  print(p)
+}
+
+# 9. Q-Q PLOTS ----------------------------------------------
+
+for (model_name in names(diagnostic_data)) {
+  
+  p <- ggplot(
+    diagnostic_data[[model_name]],
+    aes(sample = standardised_residual)
+  ) +
+    stat_qq(alpha = 0.4) +
+    stat_qq_line(colour = "red") +
+    facet_wrap(~ dataset) +
+    labs(
+      title = paste("Q-Q plot:", model_name)
+    ) +
+    theme_classic(base_size = 12)
+  
+  print(p)
+}
+
+# 10. COMPARE FIXED EFFECTS ---------------------------------
+
+extract_fixed_effects <- function(model, dataset) {
+  
+  result <- as.data.frame(
+    summary(model)$coefficients
+  )
+  
+  result$predictor <- rownames(result)
+  result$dataset <- dataset
+  
+  rownames(result) <- NULL
+  
+  result %>%
+    select(
+      dataset,
+      predictor,
+      Estimate,
+      `Std. Error`,
+      `Pr(>|t|)`
+    )
+}
+
+coefficient_results <- list()
+
+for (model_name in names(original_models)) {
+  
+  coefficient_results[[model_name]] <- bind_rows(
+    extract_fixed_effects(
+      original_models[[model_name]],
+      "Original"
+    ),
+    extract_fixed_effects(
+      positive_models[[model_name]],
+      "Positive only"
+    )
+  ) %>%
+    mutate(model = model_name)
+}
+
+coefficient_table <- bind_rows(coefficient_results)
+
+print(coefficient_table, n = Inf)
+
+# 11. SAVE RESULTS ------------------------------------------
+
+write.csv(
+  sample_results,
+  "zero_exclusion_sample_sizes.csv",
+  row.names = FALSE
+)
+
+write.csv(
+  residual_spread,
+  "zero_exclusion_residual_spread.csv",
+  row.names = FALSE
+)
+
+write.csv(
+  coefficient_table,
+  "zero_exclusion_coefficients.csv",
+  row.names = FALSE
+)
+
+for (model_name in names(diagnostic_plots)) {
+  
+  ggsave(
+    filename = paste0(
+      "zero_exclusion_",
+      model_name,
+      ".png"
+    ),
+    plot = diagnostic_plots[[model_name]],
+    width = 10,
+    height = 5,
+    dpi = 300
+  )
+}
+
+cat("\n====================================\n")
+cat("ZERO-EXCLUSION ANALYSIS COMPLETE\n")
+cat("====================================\n")
+
+
+# ============================================================
+# HETEROSCEDASTICITY ANALYSIS
+# Original stand-level data, including zeros
+# ============================================================
+
+library(lme4)
+library(lmerTest)
+library(nlme)
+library(dplyr)
+library(ggplot2)
+
+# 1. ORIGINAL MODELS ----------------------------------------
+
+original_models <- list(
+  National = models$stand_int,
+  Downy = models$stand_downy,
+  Silver = models$stand_silver
+)
+
+# 2. PREPARE DATA -------------------------------------------
+
+
+# Original models
+original_models <- list(
+  National = models$stand_int,
+  Downy = models$stand_downy,
+  Silver = models$stand_silver
+)
+
+# Extract the exact observations used in each model
+prepare_data <- function(model, model_name) {
+  
+  df <- as.data.frame(model.frame(model))
+  
+  df$area <- factor(df$area)
+  
+  # Only the national model requires stand-level grouping
+  if (model_name == "National") {
+    
+    df$stand_id <- factor(df$stand_id)
+    
+    df$stand_nested <- interaction(
+      df$area,
+      df$stand_id,
+      drop = TRUE
+    )
+  }
+  
+  return(df)
+}
+
+model_data <- list()
+
+for (model_name in names(original_models)) {
+  
+  model_data[[model_name]] <- prepare_data(
+    original_models[[model_name]],
+    model_name
+  )
+}
+
+# Check that all three datasets were created
+sapply(model_data, nrow)
+
+# Check available columns
+lapply(model_data, names)
+
+# 3. FITTING CONTROL ----------------------------------------
+
+ctrl <- nlme::lmeControl(
+  opt = "optim",
+  maxIter = 300,
+  msMaxIter = 300,
+  niterEM = 100,
+  returnObject = FALSE
+)
+
+# 4. MODEL SPECIFICATIONS ----------------------------------
+
+fixed_formulas <- lapply(
+  original_models,
+  function(m) lme4::nobars(formula(m))
+)
+
+random_formulas <- list(
+  National = ~ 1 | area/stand_nested,
+  Downy = ~ 1 | area,
+  Silver = ~ 1 | area
+)
+
+# 5. VARIANCE FUNCTIONS ------------------------------------
+
+variance_functions <- list(
+  Equal = NULL,
+  varPower = nlme::varPower(form = ~ fitted(.)),
+  varExp = nlme::varExp(form = ~ fitted(.)),
+  varConstPower = nlme::varConstPower(
+    form = ~ fitted(.)
+  )
+)
+
+# varPower requires strictly positive variance covariates.
+# The original models can have fitted values below zero.
+#
+# To avoid this restriction, use a positive, dynamically
+# updated covariate based on fitted values.
+#
+# We use exp(fitted(.) / 20), which is always positive.
+# The scaling is fixed and does not depend on the response.
+
+variance_functions$varPower <- nlme::varPower(
+  form = ~ I(exp(fitted(.) / 20))
+)
+
+variance_functions$varConstPower <- nlme::varConstPower(
+  form = ~ I(exp(fitted(.) / 20))
+)
+
+# 6. FIT MODELS ---------------------------------------------
+
+fit_variance_model <- function(
+    model_name,
+    variance_name,
+    method = "ML"
+) {
+  
+  df <- model_data[[model_name]]
+  
+  weights_arg <- variance_functions[[variance_name]]
+  
+  nlme::lme(
+    fixed = fixed_formulas[[model_name]],
+    random = random_formulas[[model_name]],
+    weights = weights_arg,
+    data = df,
+    method = method,
+    control = ctrl,
+    na.action = na.fail
+  )
+}
+
+fitted_models <- list()
+fit_log <- list()
+
+for (model_name in names(original_models)) {
+  
+  fitted_models[[model_name]] <- list()
+  
+  for (variance_name in names(variance_functions)) {
+    
+    cat(
+      "\nFitting:",
+      model_name,
+      variance_name,
+      "\n"
+    )
+    
+    result <- tryCatch(
+      fit_variance_model(
+        model_name,
+        variance_name
+      ),
+      error = function(e) {
+        message(conditionMessage(e))
+        NULL
+      }
+    )
+    
+    fitted_models[[model_name]][[variance_name]] <- result
+    
+    fit_log[[paste(model_name, variance_name)]] <-
+      data.frame(
+        model = model_name,
+        variance = variance_name,
+        success = !is.null(result)
+      )
+  }
+}
+
+fit_log_table <- bind_rows(fit_log)
+print(fit_log_table)
+
+# 7. COMPARE AIC --------------------------------------------
+
+aic_results <- list()
+
+for (model_name in names(fitted_models)) {
+  
+  for (variance_name in names(fitted_models[[model_name]])) {
+    
+    m <- fitted_models[[model_name]][[variance_name]]
+    
+    if (!is.null(m)) {
+      
+      aic_results[[paste(model_name, variance_name)]] <-
+        data.frame(
+          model = model_name,
+          variance = variance_name,
+          AIC = AIC(m),
+          BIC = BIC(m),
+          logLik = as.numeric(logLik(m))
+        )
+    }
+  }
+}
+
+aic_table <- bind_rows(aic_results) %>%
+  group_by(model) %>%
+  mutate(delta_AIC = AIC - min(AIC)) %>%
+  arrange(model, AIC) %>%
+  ungroup()
+
+print(as.data.frame(aic_table), row.names = FALSE)
+
+# 8. PEARSON RESIDUAL DIAGNOSTICS ----------------------------
+
+make_diagnostics <- function(model, name, variance) {
+  
+  data.frame(
+    fitted = as.numeric(fitted(model)),
+    pearson_residual = as.numeric(
+      resid(model, type = "pearson")
+    ),
+    model = name,
+    variance = variance
+  )
+}
+
+diagnostics <- list()
+
+for (model_name in names(fitted_models)) {
+  
+  for (variance_name in names(fitted_models[[model_name]])) {
+    
+    m <- fitted_models[[model_name]][[variance_name]]
+    
+    if (!is.null(m)) {
+      
+      diagnostics[[paste(model_name, variance_name)]] <-
+        make_diagnostics(
+          m,
+          model_name,
+          variance_name
+        )
+    }
+  }
+}
+
+diagnostic_data <- bind_rows(diagnostics)
+
+# 9. RESIDUALS VS FITTED ------------------------------------
+
+for (model_name in names(original_models)) {
+  
+  p <- diagnostic_data %>%
+    filter(model == model_name) %>%
+    ggplot(
+      aes(
+        x = fitted,
+        y = pearson_residual
+      )
+    ) +
+    geom_point(
+      alpha = 0.35,
+      size = 1.3
+    ) +
+    geom_hline(
+      yintercept = 0,
+      colour = "red"
+    ) +
+    facet_wrap(
+      ~ variance,
+      scales = "fixed"
+    ) +
+    labs(
+      title = paste(
+        model_name,
+        "— residual variance comparison"
+      ),
+      x = "Conditional fitted browsing severity",
+      y = "Pearson residual"
+    ) +
+    theme_classic(base_size = 12)
+  
+  print(p)
+}
+
+# 10. RESIDUAL SPREAD BY FITTED QUARTILE ---------------------
+
+spread_results <- diagnostic_data %>%
+  group_by(model, variance) %>%
+  mutate(
+    fitted_quartile = ntile(fitted, 4)
+  ) %>%
+  group_by(model, variance, fitted_quartile) %>%
+  summarise(
+    n = n(),
+    residual_SD = sd(
+      pearson_residual,
+      na.rm = TRUE
+    ),
+    .groups = "drop"
+  )
+
+print(
+  as.data.frame(spread_results),
+  row.names = FALSE
+)
+
+# 11. RESIDUAL SPREAD PLOTS ---------------------------------
+
+for (model_name in names(original_models)) {
+  
+  p <- spread_results %>%
+    filter(model == model_name) %>%
+    ggplot(
+      aes(
+        x = fitted_quartile,
+        y = residual_SD,
+        colour = variance,
+        group = variance
+      )
+    ) +
+    geom_line(linewidth = 1) +
+    geom_point(size = 2.5) +
+    geom_hline(
+      yintercept = 1,
+      linetype = "dashed",
+      colour = "grey50"
+    ) +
+    scale_x_continuous(breaks = 1:4) +
+    labs(
+      title = paste(
+        model_name,
+        "— standardised residual spread"
+      ),
+      x = "Fitted-value quartile",
+      y = "SD of Pearson residuals"
+    ) +
+    theme_classic(base_size = 12)
+  
+  print(p)
+}
+
+# 12. Q-Q PLOTS ---------------------------------------------
+
+for (model_name in names(original_models)) {
+  
+  p <- diagnostic_data %>%
+    filter(model == model_name) %>%
+    ggplot(
+      aes(sample = pearson_residual)
+    ) +
+    stat_qq(alpha = 0.35) +
+    stat_qq_line(colour = "red") +
+    facet_wrap(~ variance) +
+    labs(
+      title = paste(
+        model_name,
+        "— Q-Q plots"
+      )
+    ) +
+    theme_classic(base_size = 12)
+  
+  print(p)
+}
+
+# 13. SAVE COMPARISON TABLES --------------------------------
+
+write.csv(
+  aic_table,
+  "variance_model_AIC_comparison.csv",
+  row.names = FALSE
+)
+
+write.csv(
+  spread_results,
+  "variance_model_residual_spread.csv",
+  row.names = FALSE
+)
+
+write.csv(
+  fit_log_table,
+  "variance_model_fit_log.csv",
+  row.names = FALSE
+)
+
+
+# Compare original and variance-adjusted national models
+
+m_equal <- fitted_models$National$Equal
+m_varExp <- fitted_models$National$varExp
+
+original <- summary(m_equal)$tTable
+adjusted <- summary(m_varExp)$tTable
+
+comparison <- data.frame(
+  Predictor = rownames(original),
+  Original_estimate = original[, "Value"],
+  Original_SE = original[, "Std.Error"],
+  Original_p = original[, "p-value"],
+  VarExp_estimate = adjusted[, "Value"],
+  VarExp_SE = adjusted[, "Std.Error"],
+  VarExp_p = adjusted[, "p-value"],
+  row.names = NULL
+)
+
+print(comparison, row.names = FALSE)
+
+
+
+
+# ============================================================
+# NATIONAL BIRCH BROWSING FIGURES
+# Corrected varExp model
+# ============================================================
+
+# ------------------------------------------------------------
+# 1. LOAD PACKAGES
+# ------------------------------------------------------------
+
+library(nlme)
+library(lme4)
+library(emmeans)
+library(ggplot2)
+library(dplyr)
+
+# ------------------------------------------------------------
+# 2. PREPARE DATA AND REFIT MODEL
+# ------------------------------------------------------------
+
+# Use the same data as the original national model
+df_national <- model_data$National
+
+# Ensure grouping variables are factors
+df_national$area <- factor(df_national$area)
+
+df_national$stand_nested <- factor(
+  df_national$stand_nested
+)
+
+df_national$species <- factor(
+  df_national$species,
+  levels = c("Downy", "Silver")
+)
+
+# Use original national fixed-effects formula
+national_formula <- lme4::nobars(
+  formula(models$stand_int)
+)
+
+# Fit the heteroscedasticity-adjusted model directly
+# This avoids the previous weights_arg error
+
+m_varExp_fixed <- nlme::lme(
+  fixed = national_formula,
+  random = ~ 1 | area/stand_nested,
+  weights = nlme::varExp(form = ~ fitted(.)),
+  data = df_national,
+  method = "ML",
+  control = nlme::lmeControl(
+    opt = "optim",
+    maxIter = 300,
+    msMaxIter = 300,
+    niterEM = 100
+  ),
+  na.action = na.fail
+)
+
+# IMPORTANT:
+# All figures below use this corrected model
+m <- m_varExp_fixed
+
+# Check model fit
+cat("\nMODEL AIC\n")
+print(AIC(m))
+
+# Compare with previous model
+cat("\nMODEL COMPARISON\n")
+print(AIC(
+  fitted_models$National$varExp,
+  m
+))
+
+cat("\nFIXED EFFECTS\n")
+print(summary(m)$tTable)
+
+
+# ------------------------------------------------------------
+# 3. FIGURE SETTINGS
+# ------------------------------------------------------------
+
+birch_colours <- c(
+  "Downy" = "#238B45",
+  "Silver" = "#2171B5"
+)
+
+theme_birch <- theme_classic(base_size = 13) +
+  theme(
+    axis.title = element_text(
+      size = 13,
+      colour = "black"
+    ),
+    axis.text = element_text(
+      size = 11,
+      colour = "black"
+    ),
+    legend.position = "top",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 11),
+    panel.grid = element_blank(),
+    strip.text = element_text(
+      size = 12,
+      face = "bold"
+    )
+  )
+
+# Create folder for figures
+output_dir <- "Birch_varExp_figures"
+
+dir.create(
+  output_dir,
+  showWarnings = FALSE,
+  recursive = TRUE
+)
+
+
+# ------------------------------------------------------------
+# 4. FIGURE 1: ADJUSTED SPECIES MEANS
+# ------------------------------------------------------------
+
+emm_species <- emmeans(
+  m,
+  ~ species,
+  data = df_national
+)
+
+species_df <- as.data.frame(
+  summary(
+    emm_species,
+    infer = c(TRUE, TRUE)
+  )
+)
+
+cat("\n====================================\n")
+cat("ADJUSTED SPECIES MEANS\n")
+cat("====================================\n")
+print(species_df)
+
+cat("\nSPECIES CONTRAST\n")
+print(pairs(emm_species))
+
+fig_species <- ggplot(
+  species_df,
+  aes(
+    x = species,
+    y = emmean,
+    colour = species
+  )
+) +
+  geom_point(size = 3.5) +
+  geom_errorbar(
+    aes(
+      ymin = lower.CL,
+      ymax = upper.CL
+    ),
+    width = 0.12,
+    linewidth = 0.9
+  ) +
+  scale_colour_manual(
+    values = birch_colours
+  ) +
+  labs(
+    x = "Birch species",
+    y = "Adjusted browsing severity"
+  ) +
+  theme_birch +
+  theme(
+    legend.position = "none"
+  )
+
+print(fig_species)
+
+ggsave(
+  filename = file.path(
+    output_dir,
+    "Figure_1_species.png"
+  ),
+  plot = fig_species,
+  width = 5,
+  height = 4.5,
+  dpi = 600
+)
+
+
+# ------------------------------------------------------------
+# 5. CORRECTED FUNCTION FOR RELATIONSHIP FIGURES
+# ------------------------------------------------------------
+
+make_birch_figure <- function(
+    model,
+    data,
+    variable,
+    x_label,
+    file_name,
+    output_dir
+) {
+  
+  # Get observed predictor range
+  x_range <- range(
+    data[[variable]],
+    na.rm = TRUE
+  )
+  
+  # Generate 100 predictor values
+  x_values <- seq(
+    x_range[1],
+    x_range[2],
+    length.out = 100
+  )
+  
+  at_list <- setNames(
+    list(x_values),
+    variable
+  )
+  
+  # IMPORTANT CORRECTION:
+  # Include the predictor in specs.
+  # Otherwise emmeans averages over its values.
+  
+  prediction_formula <- as.formula(
+    paste("~ species *", variable)
+  )
+  
+  emm <- emmeans(
+    model,
+    specs = prediction_formula,
+    at = at_list,
+    data = data
+  )
+  
+  pred_df <- as.data.frame(
+    summary(
+      emm,
+      infer = c(TRUE, TRUE)
+    )
+  )
+  
+  # Check that predictor is present
+  if (!variable %in% names(pred_df)) {
+    stop(
+      paste(
+        "Prediction column missing:",
+        variable
+      )
+    )
+  }
+  
+  # Calculate species-specific slopes
+  trends <- emtrends(
+    model,
+    ~ species,
+    var = variable,
+    data = data
+  )
+  
+  cat("\n====================================\n")
+  cat("VARIABLE:", variable, "\n")
+  cat("====================================\n")
+  
+  cat("\nSPECIES-SPECIFIC SLOPES\n")
+  print(summary(trends, infer = c(TRUE, TRUE)))
+  
+  cat("\nDIFFERENCE BETWEEN SPECIES SLOPES\n")
+  print(pairs(trends))
+  
+  # Construct figure
+  p <- ggplot(
+    pred_df,
+    aes(
+      x = .data[[variable]],
+      y = emmean,
+      colour = species,
+      group = species
+    )
+  ) +
+    geom_ribbon(
+      aes(
+        ymin = lower.CL,
+        ymax = upper.CL
+      ),
+      fill = "grey70",
+      alpha = 0.30,
+      colour = NA
+    ) +
+    geom_line(
+      linewidth = 1.2
+    ) +
+    scale_colour_manual(
+      values = birch_colours
+    ) +
+    labs(
+      x = x_label,
+      y = "Predicted browsing severity"
+    ) +
+    theme_birch
+  
+  print(p)
+  
+  # Save PNG
+  ggsave(
+    filename = file.path(
+      output_dir,
+      file_name
+    ),
+    plot = p,
+    width = 6.5,
+    height = 4.8,
+    dpi = 600
+  )
+  
+  # Return results
+  return(
+    list(
+      plot = p,
+      predictions = pred_df,
+      trends = trends
+    )
+  )
+}
+
+
+# ------------------------------------------------------------
+# 6. FIGURE 2: SILVER BIRCH PROPORTION
+# ------------------------------------------------------------
+
+fig_prop <- make_birch_figure(
+  model = m,
+  data = df_national,
+  variable = "prop_s_stand",
+  x_label = "Proportion of silver birch",
+  file_name = "Figure_2_proportion.png",
+  output_dir = output_dir
+)
+
+
+# ------------------------------------------------------------
+# 7. FIGURE 3: LATITUDE
+# ------------------------------------------------------------
+
+fig_lat <- make_birch_figure(
+  model = m,
+  data = df_national,
+  variable = "mean_north_c",
+  x_label = "Centred latitude",
+  file_name = "Figure_3_latitude.png",
+  output_dir = output_dir
+)
+
+
+# ------------------------------------------------------------
+# 8. FIGURE 4: CERVID PELLET ABUNDANCE
+# ------------------------------------------------------------
+
+fig_cervid <- make_birch_figure(
+  model = m,
+  data = df_national,
+  variable = "total_cervid_pellets_log_mean",
+  x_label = "Total cervid pellet abundance (log)",
+  file_name = "Figure_4_cervid.png",
+  output_dir = output_dir
+)
+
+
+# ------------------------------------------------------------
+# 9. FIGURE 5: TOTAL BIRCH ABUNDANCE
+# ------------------------------------------------------------
+
+fig_birch <- make_birch_figure(
+  model = m,
+  data = df_national,
+  variable = "total_birch_c",
+  x_label = "Centred total birch abundance",
+  file_name = "Figure_5_total_birch.png",
+  output_dir = output_dir
+)
+
+
+# ------------------------------------------------------------
+# 10. FIGURE 6: HEIGHT
+# ------------------------------------------------------------
+
+fig_height <- make_birch_figure(
+  model = m,
+  data = df_national,
+  variable = "height_c",
+  x_label = "Centred birch height",
+  file_name = "Figure_6_height.png",
+  output_dir = output_dir
+)
+
+
+# ------------------------------------------------------------
+# 11. SAVE STATISTICAL RESULTS
+# ------------------------------------------------------------
+
+write.csv(
+  species_df,
+  file.path(
+    output_dir,
+    "adjusted_species_means.csv"
+  ),
+  row.names = FALSE
+)
+
+write.csv(
+  as.data.frame(pairs(emm_species)),
+  file.path(
+    output_dir,
+    "species_difference.csv"
+  ),
+  row.names = FALSE
+)
+
+# Save species-specific slopes for all predictors
+all_trends <- bind_rows(
+  lapply(
+    list(
+      proportion = fig_prop,
+      latitude = fig_lat,
+      cervid = fig_cervid,
+      total_birch = fig_birch,
+      height = fig_height
+    ),
+    function(x) {
+      as.data.frame(
+        summary(
+          x$trends,
+          infer = c(TRUE, TRUE)
+        )
+      )
+    }
+  ),
+  .id = "predictor"
+)
+
+write.csv(
+  all_trends,
+  file.path(
+    output_dir,
+    "species_specific_slopes.csv"
+  ),
+  row.names = FALSE
+)
+
+
+# ------------------------------------------------------------
+# 12. FINISHED
+# ------------------------------------------------------------
+
+cat("\n====================================\n")
+cat("ALL SIX FIGURES COMPLETED\n")
+cat("====================================\n")
+
+cat(
+  "\nFigures saved in:\n",
+  normalizePath(output_dir),
+  "\n"
+)
+
+
+# ============================================================
+# NATIONAL MODELS WITHOUT LATITUDE
+# Birch browsing severity
+# ============================================================
+
+library(nlme)
+library(lme4)
+library(emmeans)
+library(dplyr)
+
+# ------------------------------------------------------------
+# 1. USE THE SAME DATA AS THE ORIGINAL NATIONAL MODEL
+# ------------------------------------------------------------
+
+df_no_lat <- model_data$National
+
+df_no_lat$area <- factor(df_no_lat$area)
+df_no_lat$stand_nested <- factor(df_no_lat$stand_nested)
+
+df_no_lat$species <- factor(
+  df_no_lat$species,
+  levels = c("Downy", "Silver")
+)
+
+# ------------------------------------------------------------
+# 2. MODEL FORMULA WITHOUT LATITUDE
+# ------------------------------------------------------------
+
+formula_no_lat <- damage_N ~
+  species * (
+    prop_s_stand +
+      total_birch_c +
+      height_c +
+      total_cervid_pellets_log_mean
+  ) +
+  pct +
+  year
+
+# ------------------------------------------------------------
+# 3. MODEL WITH EQUAL RESIDUAL VARIANCE
+# ------------------------------------------------------------
+
+m_no_lat_equal <- nlme::lme(
+  fixed = formula_no_lat,
+  random = ~ 1 | area/stand_nested,
+  data = df_no_lat,
+  method = "ML",
+  control = nlme::lmeControl(
+    opt = "optim",
+    maxIter = 300,
+    msMaxIter = 300,
+    niterEM = 100
+  ),
+  na.action = na.fail
+)
+
+# ------------------------------------------------------------
+# 4. MODEL WITH HETEROSCEDASTICITY CORRECTION
+# ------------------------------------------------------------
+
+m_no_lat_varExp <- nlme::lme(
+  fixed = formula_no_lat,
+  random = ~ 1 | area/stand_nested,
+  weights = nlme::varExp(form = ~ fitted(.)),
+  data = df_no_lat,
+  method = "ML",
+  control = nlme::lmeControl(
+    opt = "optim",
+    maxIter = 300,
+    msMaxIter = 300,
+    niterEM = 100
+  ),
+  na.action = na.fail
+)
+
+# ------------------------------------------------------------
+# 5. COMPARE THE TWO MODELS WITHOUT LATITUDE
+# ------------------------------------------------------------
+
+cat("\nMODEL COMPARISON WITHOUT LATITUDE\n")
+
+print(AIC(
+  m_no_lat_equal,
+  m_no_lat_varExp
+))
+
+print(anova(
+  m_no_lat_equal,
+  m_no_lat_varExp
+))
+
+# ------------------------------------------------------------
+# 6. COMPARE WITH ORIGINAL MODEL CONTAINING LATITUDE
+# ------------------------------------------------------------
+
+cat("\nWITH LATITUDE VS WITHOUT LATITUDE\n")
+
+print(AIC(
+  m_varExp_fixed,
+  m_no_lat_varExp
+))
+
+# Likelihood ratio test for removing both
+# latitude and species-by-latitude interaction
+
+print(anova(
+  m_no_lat_varExp,
+  m_varExp_fixed
+))
+
+# ------------------------------------------------------------
+# 7. FIXED EFFECTS AND P-VALUES
+# ------------------------------------------------------------
+
+cat("\nEQUAL VARIANCE MODEL\n")
+print(summary(m_no_lat_equal)$tTable)
+
+cat("\nVARIANCE-ADJUSTED MODEL\n")
+print(summary(m_no_lat_varExp)$tTable)
+
+# ------------------------------------------------------------
+# 8. ADJUSTED SPECIES MEANS
+# ------------------------------------------------------------
+
+emm_no_lat <- emmeans(
+  m_no_lat_varExp,
+  ~ species,
+  data = df_no_lat
+)
+
+cat("\nADJUSTED SPECIES MEANS\n")
+
+print(
+  summary(
+    emm_no_lat,
+    infer = c(TRUE, TRUE)
+  )
+)
+
+cat("\nSPECIES DIFFERENCE\n")
+print(pairs(emm_no_lat))
+
+# ------------------------------------------------------------
+# 9. SPECIES-SPECIFIC SLOPES
+# ------------------------------------------------------------
+
+predictors <- c(
+  "prop_s_stand",
+  "total_birch_c",
+  "height_c",
+  "total_cervid_pellets_log_mean"
+)
+
+for (v in predictors) {
+  
+  cat("\n====================================\n")
+  cat("PREDICTOR:", v, "\n")
+  cat("====================================\n")
+  
+  trends <- emtrends(
+    m_no_lat_varExp,
+    ~ species,
+    var = v,
+    data = df_no_lat
+  )
+  
+  print(
+    summary(
+      trends,
+      infer = c(TRUE, TRUE)
+    )
+  )
+  
+  cat("\nSPECIES SLOPE DIFFERENCE\n")
+  print(pairs(trends))
+}
+
+# ------------------------------------------------------------
+# 10. DIRECT COEFFICIENT COMPARISON
+# ------------------------------------------------------------
+
+with_lat <- as.data.frame(
+  summary(m_varExp_fixed)$tTable
+)
+
+without_lat <- as.data.frame(
+  summary(m_no_lat_varExp)$tTable
+)
+
+with_lat$Predictor <- rownames(with_lat)
+without_lat$Predictor <- rownames(without_lat)
+
+comparison_no_lat <- merge(
+  with_lat[, c(
+    "Predictor", "Value", "Std.Error", "p-value"
+  )],
+  without_lat[, c(
+    "Predictor", "Value", "Std.Error", "p-value"
+  )],
+  by = "Predictor",
+  suffixes = c("_with_lat", "_without_lat")
+)
+
+comparison_no_lat <- comparison_no_lat %>%
+  arrange(Predictor)
+
+cat("\nCOEFFICIENT COMPARISON\n")
+
+print(
+  comparison_no_lat,
+  row.names = FALSE
+)
+
+View(comparison_no_lat)
+
+# Save comparison table
+write.csv(
+  comparison_no_lat,
+  "comparison_with_without_latitude.csv",
+  row.names = FALSE
+)
+
+# ------------------------------------------------------------
+# 11. SAVE MODELS
+# ------------------------------------------------------------
+
+saveRDS(
+  m_no_lat_equal,
+  "national_no_lat_equal.rds"
+)
+
+saveRDS(
+  m_no_lat_varExp,
+  "national_no_lat_varExp.rds"
+)
+
+cat("\nALL MODELS WITHOUT LATITUDE COMPLETED\n")
+summary(m_no_lat_equal)
+AIC(m_no_lat_equal)
+
+
+
+library(dplyr)
+library(ggplot2)
+
+# Latitude variation within each study area
+latitude_check <- df_national %>%
+  group_by(area) %>%
+  summarise(
+    n = n(),
+    mean_latitude = mean(mean_north_c, na.rm = TRUE),
+    min_latitude = min(mean_north_c, na.rm = TRUE),
+    max_latitude = max(mean_north_c, na.rm = TRUE),
+    sd_latitude = sd(mean_north_c, na.rm = TRUE),
+    latitude_range = max_latitude - min_latitude,
+    .groups = "drop"
+  )
+
+print(latitude_check, n = Inf)
+
+# How much latitude variation is explained by area?
+m_lat_area <- lm(
+  mean_north_c ~ area,
+  data = df_national
+)
+
+summary(m_lat_area)$r.squared
+
+# Visualise latitude distribution by area
+ggplot(
+  df_national,
+  aes(
+    x = reorder(area, mean_north_c, FUN = mean),
+    y = mean_north_c
+  )
+) +
+  geom_boxplot(fill = "grey80") +
+  coord_flip() +
+  labs(
+    x = "Study area",
+    y = "Centred latitude"
+  ) +
+  theme_classic()
+
+
+library(dplyr)
+
+# Identify observations more than 0.5 degrees
+# from their study area's median latitude
+
+latitude_outliers <- df_national %>%
+  group_by(area) %>%
+  mutate(
+    area_median_lat = median(
+      mean_north_c,
+      na.rm = TRUE
+    ),
+    latitude_deviation = abs(
+      mean_north_c - area_median_lat
+    )
+  ) %>%
+  ungroup() %>%
+  filter(latitude_deviation > 0.5) %>%
+  arrange(
+    desc(latitude_deviation)
+  ) %>%
+  select(
+    area,
+    stand_id,
+    species,
+    mean_north_c,
+    area_median_lat,
+    latitude_deviation
+  )
+
+print(latitude_outliers, n = Inf)
+library(dplyr)
+
+stand_gps_check <- df_national %>%
+  group_by(stand_id) %>%
+  summarise(
+    area = first(area),
+    n_observations = n(),
+    min_latitude = min(mean_north_c, na.rm = TRUE),
+    max_latitude = max(mean_north_c, na.rm = TRUE),
+    latitude_difference = max_latitude - min_latitude,
+    .groups = "drop"
+  ) %>%
+  filter(latitude_difference > 0.01) %>%
+  arrange(desc(latitude_difference))
+
+print(stand_gps_check, n = Inf)
+library(dplyr)
+
+# Median latitude of each study area
+area_locations <- df_national %>%
+  group_by(area) %>%
+  summarise(
+    median_latitude = median(mean_north_c, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Compare each unusual stand with all area medians
+closest_areas <- latitude_outliers %>%
+  distinct(area, stand_id, mean_north_c) %>%
+  rename(original_area = area) %>%
+  tidyr::crossing(
+    area_locations %>%
+      rename(candidate_area = area)
+  ) %>%
+  mutate(
+    distance = abs(mean_north_c - median_latitude)
+  ) %>%
+  group_by(stand_id) %>%
+  slice_min(distance, n = 1, with_ties = FALSE) %>%
+  ungroup() %>%
+  select(
+    original_area,
+    stand_id,
+    mean_north_c,
+    candidate_area,
+    distance
+  )
+
+print(closest_areas, n = Inf)
+# Check which east-coordinate column is available
+grep("^(E|east)$", names(df_national),
+     value = TRUE, ignore.case = TRUE)
+# Inspect the available east-coordinate variables
+east_cols <- grep(
+  "^(e|east)$",
+  names(df_national),
+  value = TRUE,
+  ignore.case = TRUE
+)
+
+if (length(east_cols) > 0) {
+  summary(df_national[east_cols])
+} else {
+  cat("No east-coordinate column in df_national\n")
+}
+# Search all data frames in your R environment
+# for columns named e or east
+
+gps_datasets <- lapply(
+  ls(envir = .GlobalEnv),
+  function(obj_name) {
+    
+    obj <- get(obj_name, envir = .GlobalEnv)
+    
+    if (!is.data.frame(obj)) return(NULL)
+    
+    east_cols <- grep(
+      "^(e|east)$",
+      names(obj),
+      value = TRUE,
+      ignore.case = TRUE
+    )
+    
+    if (length(east_cols) == 0) return(NULL)
+    
+    data.frame(
+      dataset = obj_name,
+      east_column = paste(east_cols, collapse = ", "),
+      rows = nrow(obj)
+    )
+  }
+)
+
+gps_datasets <- dplyr::bind_rows(gps_datasets)
+
+print(gps_datasets, row.names = FALSE)
+# Check coordinate columns
+grep(
+  "north|east|lat|lon|stand_id|area",
+  names(Birch_clean),
+  value = TRUE,
+  ignore.case = TRUE
+)
+
+# Check east-coordinate values
+summary(Birch_clean$east)
+
+# Look at some actual coordinates
+Birch_clean %>%
+  dplyr::select(
+    dplyr::any_of(c(
+      "area", "stand_id",
+      "north", "east",
+      "latitude", "longitude"
+    ))
+  ) %>%
+  head(15)
+library(dplyr)
+
+Birch_clean <- Birch_clean %>%
+  mutate(
+    area_checked = case_when(
+      
+      year == 2024 &
+        stand_number == "Fg31" &
+        area == "Råneå" ~ "Lofsdalen",
+      
+      year == 2024 &
+        stand_number == "NM30" &
+        area == "Lofsdalen" ~ "Nordmaling",
+      
+      year == 2024 &
+        stand_number == "Cå04" &
+        area == "Lycksele" ~ "Sorsele",
+      
+      year == 2024 &
+        stand_number == "Lau04" &
+        area == "Ljusdal" ~ "Lycksele",
+      
+      year == 2025 &
+        stand_number == "S2" &
+        area == "Ljusdal" ~ "Lycksele",
+      
+      TRUE ~ area
+    )
+  )
+

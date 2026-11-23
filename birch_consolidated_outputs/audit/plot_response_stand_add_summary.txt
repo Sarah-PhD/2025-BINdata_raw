@@ -1,4 +1,5 @@
-Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
 Formula: formula
    Data: data
 Control: lmerControl(optimizer = "bobyqa")
@@ -17,16 +18,26 @@ Random effects:
 Number of obs: 3866, groups:  stand_id:area, 491; area, 13
 
 Fixed effects:
-                                Estimate Std. Error         df t value Pr(>|t|)    
-(Intercept)                     11.04864    2.75691   20.45220   4.008 0.000666 ***
-speciesSilver                    6.68868    0.66564 3474.79088  10.048  < 2e-16 ***
-prop_s_stand                     3.35913    2.41878  441.81053   1.389 0.165601    
-mean_north_c                     1.05646    0.76278   12.72559   1.385 0.189847    
-total_birch_c                    0.08702    0.04341  384.82355   2.005 0.045686 *  
-height_c                        -5.66199    0.53716 1948.04897 -10.541  < 2e-16 ***
-total_cervid_pellets_log_mean    4.43449    0.79417  464.44449   5.584 4.01e-08 ***
-pctPCT                          -4.13755    1.11567 1558.93852  -3.709 0.000216 ***
-year2025                        -3.92599    1.38024  407.82510  -2.844 0.004673 ** 
+                                Estimate Std. Error         df t value
+(Intercept)                     11.04864    2.75691   20.45220   4.008
+speciesSilver                    6.68868    0.66564 3474.79088  10.048
+prop_s_stand                     3.35913    2.41878  441.81053   1.389
+mean_north_c                     1.05646    0.76278   12.72559   1.385
+total_birch_c                    0.08702    0.04341  384.82355   2.005
+height_c                        -5.66199    0.53716 1948.04897 -10.541
+total_cervid_pellets_log_mean    4.43449    0.79417  464.44449   5.584
+pctPCT                          -4.13755    1.11567 1558.93852  -3.709
+year2025                        -3.92599    1.38024  407.82510  -2.844
+                              Pr(>|t|)    
+(Intercept)                   0.000666 ***
+speciesSilver                  < 2e-16 ***
+prop_s_stand                  0.165601    
+mean_north_c                  0.189847    
+total_birch_c                 0.045686 *  
+height_c                       < 2e-16 ***
+total_cervid_pellets_log_mean 4.01e-08 ***
+pctPCT                        0.000216 ***
+year2025                      0.004673 ** 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 

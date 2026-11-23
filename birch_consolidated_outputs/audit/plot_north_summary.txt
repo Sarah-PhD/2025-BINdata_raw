@@ -1,4 +1,5 @@
-Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
 Formula: formula
    Data: data
 Control: lmerControl(optimizer = "bobyqa")
@@ -15,35 +16,61 @@ Random effects:
  stand_id:area         (Intercept) 151.52   12.309  
  area                  (Intercept)  73.57    8.577  
  Residual                          240.26   15.500  
-Number of obs: 1900, groups:  plot_id:stand_id:area, 1495; stand_id:area, 233; area, 6
+Number of obs: 1900, groups:  
+plot_id:stand_id:area, 1495; stand_id:area, 233; area, 6
 
 Fixed effects:
-                                         Estimate Std. Error         df t value Pr(>|t|)    
-(Intercept)                             1.759e+01  3.839e+00  6.152e+00   4.582 0.003532 ** 
-speciesSilver                           1.114e+01  1.895e+00  1.408e+03   5.877 5.21e-09 ***
-prop_s_plot                             1.520e+00  2.159e+00  1.887e+03   0.704 0.481572    
-total_birch_c                          -2.112e-03  2.511e-02  1.728e+03  -0.084 0.932965    
-height_c                                8.578e-01  4.813e-01  1.877e+03   1.782 0.074877 .  
-total_cervid_pellets_log                5.066e-01  4.687e-01  1.833e+03   1.081 0.279832    
-pctPCT                                 -5.857e+00  1.707e+00  6.358e+02  -3.432 0.000637 ***
-year2025                               -6.515e+00  2.009e+00  2.052e+02  -3.242 0.001385 ** 
-speciesSilver:prop_s_plot              -1.364e+00  2.995e+00  1.569e+03  -0.455 0.648859    
-speciesSilver:total_birch_c             1.276e-01  4.706e-02  1.284e+03   2.711 0.006802 ** 
-speciesSilver:height_c                 -1.556e+00  7.898e-01  1.544e+03  -1.970 0.048985 *  
-speciesSilver:total_cervid_pellets_log  1.200e+00  6.501e-01  1.193e+03   1.846 0.065180 .  
+                                         Estimate Std. Error         df
+(Intercept)                             1.759e+01  3.839e+00  6.152e+00
+speciesSilver                           1.114e+01  1.895e+00  1.408e+03
+prop_s_plot                             1.520e+00  2.159e+00  1.887e+03
+total_birch_c                          -2.112e-03  2.511e-02  1.728e+03
+height_c                                8.578e-01  4.813e-01  1.877e+03
+total_cervid_pellets_log                5.066e-01  4.687e-01  1.833e+03
+pctPCT                                 -5.857e+00  1.707e+00  6.358e+02
+year2025                               -6.515e+00  2.009e+00  2.052e+02
+speciesSilver:prop_s_plot              -1.364e+00  2.995e+00  1.569e+03
+speciesSilver:total_birch_c             1.276e-01  4.706e-02  1.284e+03
+speciesSilver:height_c                 -1.556e+00  7.898e-01  1.544e+03
+speciesSilver:total_cervid_pellets_log  1.200e+00  6.501e-01  1.193e+03
+                                       t value Pr(>|t|)    
+(Intercept)                              4.582 0.003532 ** 
+speciesSilver                            5.877 5.21e-09 ***
+prop_s_plot                              0.704 0.481572    
+total_birch_c                           -0.084 0.932965    
+height_c                                 1.782 0.074877 .  
+total_cervid_pellets_log                 1.081 0.279832    
+pctPCT                                  -3.432 0.000637 ***
+year2025                                -3.242 0.001385 ** 
+speciesSilver:prop_s_plot               -0.455 0.648859    
+speciesSilver:total_birch_c              2.711 0.006802 ** 
+speciesSilver:height_c                  -1.970 0.048985 *  
+speciesSilver:total_cervid_pellets_log   1.846 0.065180 .  
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Correlation of Fixed Effects:
-             (Intr) spcsSl prp_s_ ttl_b_ hght_c ttl___ pctPCT yr2025 spcsSlvr:p__ spcsSlvr:t__ spcS:_
-speciesSlvr  -0.054                                                                                  
-prop_s_plot  -0.087  0.220                                                                           
-totl_brch_c  -0.019  0.016 -0.073                                                                    
-height_c      0.018  0.094  0.184 -0.194                                                             
-ttl_crvd_p_  -0.115  0.143 -0.122  0.046 -0.010                                                      
-pctPCT       -0.098  0.007 -0.008 -0.013  0.058  0.011                                               
-year2025     -0.248 -0.009 -0.014 -0.024 -0.054  0.083 -0.090                                        
-spcsSlvr:p__  0.043 -0.744 -0.587  0.050 -0.194  0.066 -0.013 -0.011                                 
-spcsSlvr:t__  0.011 -0.201  0.073 -0.315  0.053 -0.022 -0.028  0.009  0.119                          
-spcsSlvr:h_   0.002  0.092 -0.094  0.071 -0.437 -0.024 -0.008  0.008  0.048       -0.085             
-spcsSlv:___   0.042 -0.330  0.099 -0.038 -0.007 -0.497 -0.011  0.007 -0.071        0.032        0.036
+             (Intr) spcsSl prp_s_ ttl_b_ hght_c ttl___ pctPCT yr2025
+speciesSlvr  -0.054                                                 
+prop_s_plot  -0.087  0.220                                          
+totl_brch_c  -0.019  0.016 -0.073                                   
+height_c      0.018  0.094  0.184 -0.194                            
+ttl_crvd_p_  -0.115  0.143 -0.122  0.046 -0.010                     
+pctPCT       -0.098  0.007 -0.008 -0.013  0.058  0.011              
+year2025     -0.248 -0.009 -0.014 -0.024 -0.054  0.083 -0.090       
+spcsSlvr:p__  0.043 -0.744 -0.587  0.050 -0.194  0.066 -0.013 -0.011
+spcsSlvr:t__  0.011 -0.201  0.073 -0.315  0.053 -0.022 -0.028  0.009
+spcsSlvr:h_   0.002  0.092 -0.094  0.071 -0.437 -0.024 -0.008  0.008
+spcsSlv:___   0.042 -0.330  0.099 -0.038 -0.007 -0.497 -0.011  0.007
+             spcsSlvr:p__ spcsSlvr:t__ spcS:_
+speciesSlvr                                  
+prop_s_plot                                  
+totl_brch_c                                  
+height_c                                     
+ttl_crvd_p_                                  
+pctPCT                                       
+year2025                                     
+spcsSlvr:p__                                 
+spcsSlvr:t__  0.119                          
+spcsSlvr:h_   0.048       -0.085             
+spcsSlv:___  -0.071        0.032        0.036

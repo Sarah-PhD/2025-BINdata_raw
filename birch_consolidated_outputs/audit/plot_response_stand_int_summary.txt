@@ -1,4 +1,5 @@
-Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
 Formula: formula
    Data: data
 Control: lmerControl(optimizer = "bobyqa")
@@ -17,20 +18,35 @@ Random effects:
 Number of obs: 3866, groups:  stand_id:area, 491; area, 13
 
 Fixed effects:
-                                              Estimate Std. Error         df t value Pr(>|t|)    
-(Intercept)                                   12.24632    2.85573   19.74114   4.288 0.000368 ***
-speciesSilver                                 10.65665    1.55468 3802.92758   6.855 8.31e-12 ***
-prop_s_stand                                   6.40340    2.60899  649.87760   2.454 0.014375 *  
-mean_north_c                                   0.01466    0.80595   13.77943   0.018 0.985747    
-total_birch_c                                  0.11866    0.04390  460.53705   2.703 0.007124 ** 
-height_c                                      -3.24817    0.69593 1912.75822  -4.667 3.26e-06 ***
-total_cervid_pellets_log_mean                  4.26019    0.86778  715.06256   4.909 1.13e-06 ***
-pctPCT                                        -4.11455    1.09090 1527.01415  -3.772 0.000168 ***
-year2025                                      -5.13995    1.34261  425.19599  -3.828 0.000148 ***
-speciesSilver:prop_s_stand                    -7.45176    2.46987 3677.54604  -3.017 0.002570 ** 
-speciesSilver:mean_north_c                     1.91533    0.23172 3757.96450   8.266  < 2e-16 ***
-speciesSilver:total_birch_c                   -0.15866    0.04842 3807.49416  -3.277 0.001059 ** 
-speciesSilver:height_c                        -1.48227    0.77700 3759.28939  -1.908 0.056508 .  
-speciesSilver:total_cervid_pellets_log_mean   -0.06114    0.73860 3846.21650  -0.083 0.934038    
+                                              Estimate Std. Error         df
+(Intercept)                                   12.24632    2.85573   19.74114
+speciesSilver                                 10.65665    1.55468 3802.92758
+prop_s_stand                                   6.40340    2.60899  649.87760
+mean_north_c                                   0.01466    0.80595   13.77943
+total_birch_c                                  0.11866    0.04390  460.53705
+height_c                                      -3.24817    0.69593 1912.75822
+total_cervid_pellets_log_mean                  4.26019    0.86778  715.06256
+pctPCT                                        -4.11455    1.09090 1527.01415
+year2025                                      -5.13995    1.34261  425.19599
+speciesSilver:prop_s_stand                    -7.45176    2.46987 3677.54604
+speciesSilver:mean_north_c                     1.91533    0.23172 3757.96450
+speciesSilver:total_birch_c                   -0.15866    0.04842 3807.49416
+speciesSilver:height_c                        -1.48227    0.77700 3759.28939
+speciesSilver:total_cervid_pellets_log_mean   -0.06114    0.73860 3846.21650
+                                            t value Pr(>|t|)    
+(Intercept)                                   4.288 0.000368 ***
+speciesSilver                                 6.855 8.31e-12 ***
+prop_s_stand                                  2.454 0.014375 *  
+mean_north_c                                  0.018 0.985747    
+total_birch_c                                 2.703 0.007124 ** 
+height_c                                     -4.667 3.26e-06 ***
+total_cervid_pellets_log_mean                 4.909 1.13e-06 ***
+pctPCT                                       -3.772 0.000168 ***
+year2025                                     -3.828 0.000148 ***
+speciesSilver:prop_s_stand                   -3.017 0.002570 ** 
+speciesSilver:mean_north_c                    8.266  < 2e-16 ***
+speciesSilver:total_birch_c                  -3.277 0.001059 ** 
+speciesSilver:height_c                       -1.908 0.056508 .  
+speciesSilver:total_cervid_pellets_log_mean  -0.083 0.934038    
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

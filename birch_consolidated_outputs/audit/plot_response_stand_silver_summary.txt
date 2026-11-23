@@ -1,4 +1,5 @@
-Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
 Formula: formula
    Data: data
 Control: lmerControl(optimizer = "bobyqa")
@@ -17,15 +18,24 @@ Random effects:
 Number of obs: 1779, groups:  stand_id:area, 364; area, 13
 
 Fixed effects:
-                                Estimate Std. Error         df t value Pr(>|t|)    
-(Intercept)                    19.575376   3.949722  32.575843   4.956 2.16e-05 ***
-prop_s_stand                    1.029661   3.452018 316.756462   0.298  0.76569    
-mean_north_c                    2.272127   0.963390  10.716206   2.358  0.03848 *  
-total_birch_c                  -0.003654   0.072118 333.225998  -0.051  0.95962    
-height_c                       -2.326223   1.011051 319.073396  -2.301  0.02205 *  
-total_cervid_pellets_log_mean   4.681398   1.033522 326.442374   4.530 8.30e-06 ***
-pctPCT                         -4.591126   1.565952 901.344038  -2.932  0.00345 ** 
-year2025                       -2.677932   1.909839 301.678118  -1.402  0.16189    
+                                Estimate Std. Error         df t value
+(Intercept)                    19.575376   3.949722  32.575843   4.956
+prop_s_stand                    1.029661   3.452018 316.756462   0.298
+mean_north_c                    2.272127   0.963390  10.716206   2.358
+total_birch_c                  -0.003654   0.072118 333.225998  -0.051
+height_c                       -2.326223   1.011051 319.073396  -2.301
+total_cervid_pellets_log_mean   4.681398   1.033522 326.442374   4.530
+pctPCT                         -4.591126   1.565952 901.344038  -2.932
+year2025                       -2.677932   1.909839 301.678118  -1.402
+                              Pr(>|t|)    
+(Intercept)                   2.16e-05 ***
+prop_s_stand                   0.76569    
+mean_north_c                   0.03848 *  
+total_birch_c                  0.95962    
+height_c                       0.02205 *  
+total_cervid_pellets_log_mean 8.30e-06 ***
+pctPCT                         0.00345 ** 
+year2025                       0.16189    
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 

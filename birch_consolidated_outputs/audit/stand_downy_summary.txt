@@ -1,4 +1,5 @@
-Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
 Formula: formula
    Data: data
 Control: lmerControl(optimizer = "bobyqa")
@@ -16,15 +17,24 @@ Random effects:
 Number of obs: 387, groups:  area, 13
 
 Fixed effects:
-                               Estimate Std. Error        df t value Pr(>|t|)    
-(Intercept)                    14.90837    3.70056  15.02022   4.029  0.00109 ** 
-prop_s_stand                    8.08697    3.07808 378.69834   2.627  0.00896 ** 
-mean_north_c                   -0.60273    1.02866  13.66992  -0.586  0.56747    
-total_birch_c                   0.15460    0.05293 373.92400   2.921  0.00370 ** 
-height_c                       -0.60775    0.98871 373.39852  -0.615  0.53913    
-total_cervid_pellets_log_mean   4.15914    1.02185 376.94570   4.070 5.73e-05 ***
-pctPCT                         -4.03232    1.86184 373.44249  -2.166  0.03096 *  
-year2025                       -7.74309    1.80726 376.93545  -4.284 2.33e-05 ***
+                               Estimate Std. Error        df t value Pr(>|t|)
+(Intercept)                    14.90837    3.70056  15.02022   4.029  0.00109
+prop_s_stand                    8.08697    3.07808 378.69834   2.627  0.00896
+mean_north_c                   -0.60273    1.02866  13.66992  -0.586  0.56747
+total_birch_c                   0.15460    0.05293 373.92400   2.921  0.00370
+height_c                       -0.60775    0.98871 373.39852  -0.615  0.53913
+total_cervid_pellets_log_mean   4.15914    1.02185 376.94570   4.070 5.73e-05
+pctPCT                         -4.03232    1.86184 373.44249  -2.166  0.03096
+year2025                       -7.74309    1.80726 376.93545  -4.284 2.33e-05
+                                 
+(Intercept)                   ** 
+prop_s_stand                  ** 
+mean_north_c                     
+total_birch_c                 ** 
+height_c                         
+total_cervid_pellets_log_mean ***
+pctPCT                        *  
+year2025                      ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 

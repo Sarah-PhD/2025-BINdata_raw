@@ -1,4 +1,5 @@
-Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
+Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
 Formula: formula
    Data: data
 Control: lmerControl(optimizer = "bobyqa")
@@ -15,23 +16,39 @@ Random effects:
  stand_id:area         (Intercept) 130.459  11.422  
  area                  (Intercept)  91.641   9.573  
  Residual                          258.351  16.073  
-Number of obs: 3853, groups:  plot_id:stand_id:area, 3050; stand_id:area, 489; area, 13
+Number of obs: 3853, groups:  
+plot_id:stand_id:area, 3050; stand_id:area, 489; area, 13
 
 Fixed effects:
-                                         Estimate Std. Error         df t value Pr(>|t|)    
-(Intercept)                              17.72310    2.90779   12.97706   6.095 3.84e-05 ***
-speciesSilver                             7.87352    1.37833 2834.71914   5.712 1.23e-08 ***
-prop_s_plot                               4.23284    1.56429 3836.61252   2.706  0.00684 ** 
-north_c                                   0.08300    0.89795   14.30024   0.092  0.92764    
-total_birch_c                             0.03516    0.02071 3677.15183   1.697  0.08972 .  
-height_c                                 -0.43972    0.36444 3778.37650  -1.207  0.22767    
-total_cervid_pellets_log                  0.73362    0.36764 3787.62933   1.995  0.04606 *  
-pctPCT                                   -3.42709    1.10255 1459.13427  -3.108  0.00192 ** 
-year2025                                 -7.33985    1.29948  432.40256  -5.648 2.94e-08 ***
-speciesSilver:prop_s_plot                -5.23529    2.13118 3320.39137  -2.457  0.01408 *  
-speciesSilver:north_c                     2.15441    0.22006 2212.31145   9.790  < 2e-16 ***
-speciesSilver:total_birch_c              -0.04266    0.03275 2705.49001  -1.303  0.19279    
-speciesSilver:height_c                   -1.12051    0.49433 3445.36940  -2.267  0.02347 *  
-speciesSilver:total_cervid_pellets_log    0.47636    0.46513 2619.93503   1.024  0.30586    
+                                         Estimate Std. Error         df
+(Intercept)                              17.72310    2.90779   12.97706
+speciesSilver                             7.87352    1.37833 2834.71914
+prop_s_plot                               4.23284    1.56429 3836.61252
+north_c                                   0.08300    0.89795   14.30024
+total_birch_c                             0.03516    0.02071 3677.15183
+height_c                                 -0.43972    0.36444 3778.37650
+total_cervid_pellets_log                  0.73362    0.36764 3787.62933
+pctPCT                                   -3.42709    1.10255 1459.13427
+year2025                                 -7.33985    1.29948  432.40256
+speciesSilver:prop_s_plot                -5.23529    2.13118 3320.39137
+speciesSilver:north_c                     2.15441    0.22006 2212.31145
+speciesSilver:total_birch_c              -0.04266    0.03275 2705.49001
+speciesSilver:height_c                   -1.12051    0.49433 3445.36940
+speciesSilver:total_cervid_pellets_log    0.47636    0.46513 2619.93503
+                                       t value Pr(>|t|)    
+(Intercept)                              6.095 3.84e-05 ***
+speciesSilver                            5.712 1.23e-08 ***
+prop_s_plot                              2.706  0.00684 ** 
+north_c                                  0.092  0.92764    
+total_birch_c                            1.697  0.08972 .  
+height_c                                -1.207  0.22767    
+total_cervid_pellets_log                 1.995  0.04606 *  
+pctPCT                                  -3.108  0.00192 ** 
+year2025                                -5.648 2.94e-08 ***
+speciesSilver:prop_s_plot               -2.457  0.01408 *  
+speciesSilver:north_c                    9.790  < 2e-16 ***
+speciesSilver:total_birch_c             -1.303  0.19279    
+speciesSilver:height_c                  -2.267  0.02347 *  
+speciesSilver:total_cervid_pellets_log   1.024  0.30586    
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
